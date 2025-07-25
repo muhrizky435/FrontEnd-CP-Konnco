@@ -4,13 +4,16 @@ import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
 import { useInView } from "react-intersection-observer";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
+// gambar dummy
 import medis2 from "../assets/img/medis-2 1.png";
 import cc1 from "../assets/img/cc-1 1.png";
 import sekolah1 from "../assets/img/sekolah-1 1.png";
@@ -213,7 +216,7 @@ function ProductApp() {
             <h1 className="text-2xl md:text-3xl font-bold mb-2">
               Konnco Products
             </h1>
-            <div className="text-gray-700 text-base md:text-lg max-w-2xl mx-auto text-justify">
+            <div className="text-gray-700 text-base md:text-lg max-w-2xl mx-auto text-center">
               Setiap produk dirancang dengan fokus pada kemudahan penggunaan,
               keandalan, dan nilai fungsional yang tinggi.
             </div>
@@ -227,22 +230,25 @@ function ProductApp() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.2 }}
                 variants={fadeUp}
-                className={`flex flex-col md:flex-row items-stretch rounded-2xl shadow-[5px_5px_15px_rgba(0,0,0,0.4)] overflow-hidden bg-white text-justify
-                  ${idx % 2 === 1 ? "md:flex-row-reverse" : ""}`}
+                className={`flex flex-col md:flex-row items-stretch md:min-h-[360px] md:h-[360px] rounded-2xl shadow-[5px_5px_15px_rgba(0,0,0,0.4)] overflow-hidden bg-white text-justify
+                ${idx % 2 === 1 ? "md:flex-row-reverse" : ""}`}
               >
-                <div className="w-full md:w-1/2 h-64 md:h-auto">
+                {/* Image Section */}
+                <div className="w-full md:w-1/2 h-64 md:h-full">
                   <img
                     src={prod.images[0]}
                     alt={prod.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="w-full md:w-1/2 flex flex-col justify-between p-6 md:p-8">
-                  <div>
+
+                {/* Content Section */}
+                <div className="w-full md:w-1/2 flex flex-col justify-between p-6 md:p-8 md:h-full">
+                  <div className="flex-grow">
                     <h2 className="text-xl md:text-2xl font-bold mb-2 text-black">
                       {prod.title}
                     </h2>
-                    <div className="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
+                    <div className="text-gray-700 text-base md:text-lg leading-relaxed mb-4 line-clamp-4">
                       {prod.desc}
                     </div>
                   </div>

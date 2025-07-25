@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { EDUCATION_LEVELS, LENGTH_OF_SERVICE } from "./constants";
 
 void motion;
 const skillList = [
@@ -46,46 +47,59 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
           Pendidikan Terakhir
         </h3>
         <div className="space-y-4 text-left">
-          <label className="block text-sm mb-1 text-left">Jenjang</label>
-          <input
-            name="jenjang"
-            type="text"
+          <label className="block text-sm mb-1 font-medium text-left">
+            Jenjang
+          </label>
+          <select
+            name="educationLevel"
             className="w-full border border-gray-300 px-3 py-2 rounded"
-            value={formData.jenjang || ""}
+            value={formData.educationLevel || ""}
             onChange={(e) =>
-              setFormData({ ...formData, jenjang: e.target.value })
+              setFormData({ ...formData, educationLevel: e.target.value })
             }
             required
-          />
-          <label className="block text-sm mt-4 mb-1 text-left">
+          >
+            <option value="">-- Pilih Jenjang --</option>
+            {EDUCATION_LEVELS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
+          <label className="block text-sm mt-4 mb-1 font-medium text-left">
             Nama Institusi
           </label>
           <input
+            name="instituteName"
             type="text"
             className="w-full border border-gray-300 px-3 py-2 rounded"
-            value={formData.educationInstitution || ""}
+            value={formData.instituteName || ""}
             onChange={(e) =>
-              setFormData({ ...formData, educationInstitution: e.target.value })
+              setFormData({ ...formData, instituteName: e.target.value })
             }
             required
           />
         </div>
 
         {/* Pengalaman Kerja */}
-        <h3 className="text-lg font-semibold text-left mb-2 mt-6">
+        <h3 className="text-lg font-semibold text-left mb-4 mt-6">
           Pengalaman Kerja
         </h3>
         <div className="space-y-4 text-left ">
-          <label className="block text-sm font-medium mb-2 mt-3">
-            Nama Perusahaan
-          </label>
+          <div className="flex items-center gap-2">
+            <label className="block text-sm font-medium mt-2">
+              Nama Perusahaan
+            </label>
+            <div className="text-gray-400 text-sm">(opsional)</div>
+          </div>
           <input
-            name="namaPerusahaan"
+            name="companyName"
             type="text"
             className="w-full border border-gray-300 px-3 py-2 rounded mb-2"
-            value={formData.namaPerusahaan || ""}
+            value={formData.companyName || ""}
             onChange={(e) =>
-              setFormData({ ...formData, namaPerusahaan: e.target.value })
+              setFormData({ ...formData, companyName: e.target.value })
             }
           />
 
@@ -96,12 +110,12 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
             <div className="text-gray-400 text-sm">(opsional)</div>
           </div>
           <input
-            name="jabatan"
+            name="position"
             type="text"
             className="w-full border border-gray-300 px-3 py-2 rounded mb-2"
-            value={formData.jabatan || ""}
+            value={formData.position || ""}
             onChange={(e) =>
-              setFormData({ ...formData, workPosition: e.target.value })
+              setFormData({ ...formData, position: e.target.value })
             }
           />
 
@@ -109,17 +123,22 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
             <label htmlFor="lamaBekerja" className="text-black">
               Lama Bekerja
             </label>
-            <div className="text-gray-400 text-sm">(opsional)</div>
+            <select
+              name="lengthOfService"
+              className="w-full border border-gray-300 px-3 py-2 rounded"
+              value={formData.lengthOfService || ""}
+              onChange={(e) =>
+                setFormData({ ...formData, lengthOfService: e.target.value })
+              }
+            >
+              <option value="">-- Pilih Lama Bekerja --</option>
+              {LENGTH_OF_SERVICE.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
-          <input
-            name="lamaBekerja"
-            type="text"
-            className="w-full border border-gray-300 px-3 py-2 rounded"
-            value={formData.lamaBekerja || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, lamaBekerja: e.target.value })
-            }
-          />
         </div>
 
         {/* Skill */}
@@ -132,18 +151,18 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
             <div className="text-gray-400 text-sm">(pilih 1 atau lebih)</div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {skillList.map((skill) => (
+            {skillList.map((skills) => (
               <button
                 type="button"
-                key={skill}
+                key={skills}
                 className={`text-sm px-3 py-1 rounded transition-colors duration-200 ${
-                  selectedSkills.includes(skill)
+                  selectedSkills.includes(skills)
                     ? "bg-[#E86A1C] text-black shadow-[0_4px_0_0_#b45309]"
                     : "bg-white text-black hover:bg-orange-400 hover:text-black border border-black shadow-[0_4px_0_0_gray]"
                 }`}
-                onClick={() => toggleSkill(skill)}
+                onClick={() => toggleSkill(skills)}
               >
-                {skill}
+                {skills}
               </button>
             ))}
           </div>
@@ -162,7 +181,16 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
           Sebelumnya
         </button>
         <button
-          onClick={handleNext}
+          type="button"
+          onClick={() => {
+            // Validasi input manual
+            const { educationLevel, instituteName } = formData;
+            if (!educationLevel || !instituteName) {
+              alert("Pendidikan terakhir wajub diisi");
+              return;
+            }
+            handleNext();
+          }}
           className="font-semibold flex items-center gap-1 mt-2 group w-fit text-[#E86A1C] hover:text-[#F77F4D] transition-colors"
         >
           Selanjutnya

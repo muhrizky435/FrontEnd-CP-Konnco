@@ -1,22 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api/axios";
 import { useInView } from "react-intersection-observer";
 import KonncoLoader from "../components/KonncoLoader";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
+import { motion } from "framer-motion";
 import { BsFillTelephonePlusFill } from "react-icons/bs";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoIosMail } from "react-icons/io";
+import {
+  logoKonnco,
+  logoWhite,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
 
+void motion;
 function ContactApp() {
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
+
+  const navigate = useNavigate();
 
   // Animation variants
   const fadeUp = {
@@ -62,14 +70,28 @@ function ContactApp() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
-      setForm({ nama: "", email: "", pesan: "" });
+
+    try {
+      const response = await api.post("/inquiries", {
+        senderName: form.nama,
+        email: form.email,
+        subject: "Contact Form", 
+        message: form.pesan,
+      });
+
+      console.log("Respon API:", response.data);
       alert("Pesan berhasil dikirim!");
-    }, 1200);
+      setForm({ nama: "", email: "", pesan: "" });
+      navigate(`/thanks?type=contact&inquiryId=${response.data.data.id}`);
+    } catch (err) {
+      console.error("Gagal kirim pesan:", err);
+      alert("Gagal mengirim pesan. Silakan coba lagi.");
+    } finally {
+      setSending(false);
+    }
   };
 
   if (loading) return <KonncoLoader />;
@@ -88,42 +110,61 @@ function ContactApp() {
 
       <main className="flex-1 w-full pt-10 pb-20 px-2 md:px-0 bg-white">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="text-center mb-8"
+          >
             <div className="text-[#E86A1C] font-semibold text-xl mb-1">
               Our Contacts
             </div>
             <div className="text-3xl font-bold text-[#18253A] mb-2">
               Konnco Contacts
             </div>
-            <div className="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
-              Bergabunglah bersama tim yang berfokus pada inovasi, kualitas, dan dampak nyata. Kami merancang produk yang mudah digunakan, andal, dan bernilai tinggi bagi pengguna. Di sini, setiap peran memiliki arti dan ruang untuk tumbuh bersama.
+            <div className="text-gray-700 text-base md:text-lg leading-relaxed text-center">
+              Bergabunglah bersama tim yang berfokus pada inovasi, kualitas, dan
+              dampak nyata. Kami merancang produk yang mudah digunakan, andal,
+              dan bernilai tinggi bagi pengguna. Di sini, setiap peran memiliki
+              arti dan ruang untuk tumbuh bersama.
             </div>
-          </div>
+          </motion.div>
 
           {/* Kontak Box */}
-          <div className="bg-white border border-[#E86A1C] rounded-2xl mb-10 overflow-hidden shadow-sm text-justify">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="bg-white border border-[#E86A1C] rounded-2xl mb-10 overflow-hidden shadow-sm text-justify"
+          >
             <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-200">
-                <BsFillTelephonePlusFill className="text-orange-500" />
+              <BsFillTelephonePlusFill className="text-orange-500" />
               <span className="text-gray-800 text-base font-medium select-all">
                 +62 822 1234 5678
               </span>
             </div>
             <div className="flex items-center gap-4 px-6 py-4 border-b border-gray-200">
-                <FaLocationDot className="text-orange-500" />
+              <FaLocationDot className="text-orange-500" />
               <span className="text-gray-800 text-base font-medium">
-                Ruko, Pd. Permai Taman Tirta 2 No.18, Ngentak, Bangunjiwo, Kec. Kasihan, Kabupaten Bantul, Daerah Istimewa Yogyakarta 55184
+                Ruko, Pd. Permai Taman Tirta 2 No.18, Ngentak, Bangunjiwo, Kec.
+                Kasihan, Kabupaten Bantul, Daerah Istimewa Yogyakarta 55184
               </span>
             </div>
             <div className="flex items-center gap-4 px-6 py-4">
-                <IoIosMail className="text-orange-500" />
+              <IoIosMail className="text-orange-500" />
               <span className="text-gray-800 text-base font-medium select-all">
                 support@konnco.com
               </span>
             </div>
-          </div>
+          </motion.div>
 
           {/* Form Kontak */}
-          <div className="bg-white rounded-2xl border border-[#E86A1C] shadow-md px-6 py-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="bg-white rounded-2xl border border-[#E86A1C] shadow-md px-6 py-8"
+          >
             <div className="text-center text-2xl font-bold text-[#18253A] mb-6">
               Kontak Kami
             </div>
@@ -190,32 +231,17 @@ function ContactApp() {
                 className="w-full px-4 py-3 text-white bg-[#E86A1C] rounded-md hover:bg-[#F77F4D] transition-all duration-300 ease-in-out flex items-center justify-center gap-2 shadow-[0_4px_0_0_#b45309]"
               >
                 {sending ? (
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4.293 12.293a1 1 0 011.414 0L12 18.586l6.293-6.293a1 1 0 011.414 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 010-1.414z"
-                    ></path>
-                  </svg>
+                  <img
+                    src={logoKonnco}
+                    alt="Loading..."
+                    className="h-6 w-6 animate-spin"
+                  />
                 ) : (
                   "Kirim Pesan"
                 )}
               </button>
             </form>
-          </div>
+          </motion.div>
         </div>
       </main>
 

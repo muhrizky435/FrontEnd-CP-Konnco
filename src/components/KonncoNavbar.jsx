@@ -94,8 +94,8 @@ const KonncoNavbar = ({
       className="flex justify-between items-center w-full px-4 md:px-10 pt-2 pb-5 bg-white sticky top-0 z-30 border-b border-orange-200"
     >
       {/* LOGO */}
-      <div className="flex items-center">
-        <Link to="/" className="flex items-center gap-3 group">
+      <div className="flex items-center" to="/">
+        <Link className="flex items-center gap-3 group">
           <motion.img
             src={logoKonnco}
             alt="Konnco Studio Logo"
@@ -187,7 +187,7 @@ const KonncoNavbar = ({
         ref={drawerRef}
         className={`fixed top-0 right-0 h-full z-50 bg-orange-50 transition-transform duration-300 ${
           drawerOpen ? "translate-x-0" : "translate-x-full"
-        } w-[80vw] max-w-xs md:hidden rounded-l-3xl shadow-2xl flex flex-col`}
+        } w-[80vw] max-w-xs md:hidden rounded-l-3xl shadow-2xl flex flex-col overflow-y-auto`}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">

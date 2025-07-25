@@ -4,15 +4,18 @@ import { motion } from "framer-motion";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
+// tes
 import tes1 from "../assets/img/tes1.png";
 import tes2 from "../assets/img/tes1.png";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
 
 void motion
 const fadeUp = {

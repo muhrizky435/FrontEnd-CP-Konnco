@@ -1,59 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import api from "../api/axios";
 import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 import KonncoLoader from "../components/KonncoLoader";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
-// contoh
-import blog1 from "../assets/img/blog1.png";
-import blog2 from "../assets/img/tes1.png";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
 
-const dummyBlogs = [
-  {
-    id: 1,
-    title: "Apa Itu React Router?",
-    author: "Siti Rahmawati",
-    date: "2025-06-30",
-    category: "TECH",
-    image_url: blog1,
-    desc: `
-      React Router adalah pustaka routing untuk aplikasi React. 
-      Ini memungkinkan navigasi antar halaman dalam SPA (Single Page Application) tanpa reload halaman penuh.
-    `,
-  },
-  {
-    id: 2,
-    title: "Belajar CSS Grid dengan Mudah",
-    author: "Ade Rohimat",
-    date: "2025-07-01",
-    category: "Tech",
-    image_url: blog2,
-    desc: `
-      CSS Grid memungkinkan pengaturan layout dua dimensi dengan efisien.
-      Dengan Grid, kamu bisa mengatur kolom dan baris secara lebih fleksibel.
-    `,
-  },
-  {
-    id: 3,
-    title: "Belajar CSS Grid dengan Mudah",
-    author: "Ade Rohimat",
-    date: "2025-07-01",
-    category: "DESIGN",
-    image_url: "https://source.unsplash.com/800x400/?web,design",
-    desc: `
-      CSS Grid memungkinkan pengaturan layout dua dimensi dengan efisien.
-      Dengan Grid, kamu bisa mengatur kolom dan baris secara lebih fleksibel.
-    `,
-  },
-];
 
+void motion;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
@@ -75,10 +39,33 @@ function BlogsApp() {
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0 });
 
   useEffect(() => {
-    setTimeout(() => {
-      setBlogs(dummyBlogs);
-      setLoading(false);
-    }, 1000);
+    api
+      .get("/blogs")
+      .then((res) => {
+        console.log("RESPON BLOG:", res.data);
+        const data = res.data?.data || [];
+        const formatted = data.map((blogs) => ({
+          id: blogs.id,
+          title: blogs.title || "Judul tidak tersedia",
+          author: blogs.author?.name || "Admin",
+          date: blogs.createdAt
+            ? new Date(blogs.createdAt).toISOString().split("T")[0]
+            : "Tanggal tidak tersedia",
+          category: blogs.category || "TECH",
+          image_url: blogs.photo
+            ? `http://localhost:3000${blogs.photo}`
+            : "https://source.unsplash.com/800x400/?technology",
+          desc: blogs.description
+            ? blogs.description.slice(0, 120) + "..."
+            : "Tidak ada deskripsi.",
+          slug: blogs.slug,
+        }));
+        setBlogs(formatted);
+      })
+      .catch((err) => {
+        console.error("Gagal ambil blog:", err.response?.data || err.message);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
@@ -99,11 +86,25 @@ function BlogsApp() {
 
       <main className="flex-1 w-full pt-4 pb-10">
         <div className="w-full mx-auto px-4 md:px-20">
-          <div className="text-center mb-8">
-            <div className="text-[#E86A1C] font-bold text-2xl mb-8">
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="text-center mb-8"
+          >
+            <div className="text-[#E86A1C] font-bold text-2xl mb-4">
               Our Blogs
             </div>
-          </div>
+            <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 mt-2">
+              Konnco Blogs
+            </h1>
+            <p className="text-gray-900 max-w-2xl mx-auto text-sm md:text-base text-center">
+              Kami percaya bahwa berbagi wawasan adalah bagian penting dari
+              pengembangan teknologi yang berkelanjutan. Melalui blog ini, kami
+              membagikan berbagai artikel. studi kasus, dan tips seputar
+              pengembangan aplikasi, desain sistem, serta teknologi terkini.
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {blogs.map((blog, idx) => (
@@ -172,7 +173,7 @@ function BlogsApp() {
                   </div>
 
                   <Link
-                    to={`/detail_blogs/${blog.id}`}
+                    to={`/detail_blogs/${blog.slug}`}
                     className="font-semibold flex items-center gap-1 mt-2 group w-fit"
                     style={{ color: "#E86A1C" }}
                   >

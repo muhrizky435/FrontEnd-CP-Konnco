@@ -1,4 +1,4 @@
-import React, {  useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Step1 from "../components/forms/StepForm1";
@@ -10,13 +10,16 @@ import KonncoLoader from "../components/KonncoLoader";
 import StepIndicator from "../components/forms/StepIndicator";
 import toast, { Toaster } from "react-hot-toast";
 import { submitCareerForm } from "../utils/api";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
+import { useParams } from "react-router-dom";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
 
 void motion;
 
@@ -35,13 +38,12 @@ const fadeRight = {
 
 const CareerApply = () => {
   const [step, setStep] = useState(1);
-  const [ setLoading] = useState(false);
+  const [setLoading] = useState(false);
   const [formData, setFormData] = useState({});
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
+  const { careerId } = useParams();
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0 });
-
-
 
   const handleNext = (data) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -49,9 +51,8 @@ const CareerApply = () => {
   };
 
   const handleBack = () => {
-  setStep((prev) => prev - 1);
+    setStep((prev) => prev - 1);
   };
-
 
   const handleSubmit = async (data) => {
     setLoading(true);
@@ -69,7 +70,7 @@ const CareerApply = () => {
 
   return (
     <div className="min-h-screen bg-white text-black">
-        <KonncoNavbar
+      <KonncoNavbar
         fadeUp={fadeUp}
         fadeLeft={fadeLeft}
         fadeRight={fadeRight}
@@ -106,6 +107,7 @@ const CareerApply = () => {
                 onBack={handleBack}
                 formData={formData}
                 setFormData={setFormData}
+                careerId={careerId}
               />
             )}
           </AnimatePresence>

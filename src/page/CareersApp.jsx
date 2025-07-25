@@ -4,14 +4,18 @@ import { useInView } from "react-intersection-observer";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
+import { motion } from "framer-motion";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink,
+} from "../assets/img";
 
+void motion;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
@@ -45,7 +49,7 @@ const Careers = () => {
       summary:
         "Kami sedang mencari Full-Stack Developer yang berpengalaman untuk bergabung dengan tim teknologi kami...",
       tags: ["Active", "Fulltime", "Coding", "Website"],
-      image: "/img/Code.png"
+      image: "/img/Code.png",
     },
     {
       id: 2,
@@ -53,7 +57,7 @@ const Careers = () => {
       summary:
         "Kami mencari seorang Mobile Developer – React Native yang berdedikasi dan berpengalaman untuk membangun serta mengembangkan aplik...",
       tags: ["Active", "Fulltime", "Coding", "Mobile"],
-      image: "/img/Mobile.png"
+      image: "/img/Mobile.png",
     },
   ];
 
@@ -71,27 +75,40 @@ const Careers = () => {
         drawerRef={drawerRef}
       />
       <main className="px-4 md:px-10 lg:px-24 pt-4 pb-20">
-        <div className="text-center mb-12">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="text-center mb-12"
+        >
           <p className="text-[#E86A1C] font-semibold text-2xl">Our Products</p>
           <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 mt-4">
             Konnco Careers
           </h1>
-          <p className="text-gray-900 max-w-2xl mx-auto text-sm md:text-base text-justify">
+          <p className="text-gray-900 max-w-2xl mx-auto text-sm md:text-base text-center">
             Bergabunglah bersama tim yang berfokus pada inovasi, kualitas, dan
             dampak nyata. Kami merancang produk yang mudah digunakan, andal, dan
             bernilai tinggi bagi pengguna. Di sini, setiap peran memiliki arti
             dan ruang untuk tumbuh bersama.
           </p>
-        </div>
+        </motion.div>
 
         <div className="space-y-8">
           {careers.map((career) => (
-            <div
+            <motion.div
               key={career.id}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              variants={fadeUp}
               className="bg-white border rounded-2xl overflow-hidden md:flex text-justify border-black shadow-[0_4px_0_0_gray]"
             >
-              <div className="bg-orange-500 w-full md:w-1/4 h-32 md:h-auto flex items-center justify-center">
-                <img src={career.image} alt="" className="w-21 h-21" />
+              <div className="bg-orange-500 w-full md:w-1/4 aspect-square md:aspect-auto md:h-auto flex items-center justify-center p-4">
+                <img
+                  src={career.image}
+                  alt="gambar"
+                  className="w-16 h-16 md:w-24 md:h-24 object-contain"
+                />
               </div>
               <div className="p-6 w-full">
                 <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
@@ -112,7 +129,7 @@ const Careers = () => {
                 </div>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => (window.location.href = "/careers_apply")}
+                    onClick={() => (window.location.href = `/careers_apply/${career.id}`)}
                     className="bg-[#E86A1C] font-bold flex items-center gap-1 mt-2 group w-fit text-white rounded-lg px-6 py-2 hover:bg-[#F77F4D] shadow-[0_4px_0_0_#b45309] transition-colors"
                   >
                     Apply
@@ -128,7 +145,7 @@ const Careers = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </main>

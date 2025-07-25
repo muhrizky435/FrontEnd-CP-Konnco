@@ -4,14 +4,16 @@ import { useInView } from "react-intersection-observer";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
-import logoKonnco from "../assets/img/logo-konnco.png";
-import logoWhite from "../assets/img/icon-white 1.png";
-import logoEmail from "../assets/img/Email.png";
-import logoFB from "../assets/img/Facebook.png";
-import logoIG from "../assets/img/Instagram.png";
-import logoTiktok from "../assets/img/TikTok.png";
-import logoLink from "../assets/img/Linkedin.png";
 import { BiMoneyWithdraw } from "react-icons/bi";
+import {
+  logoKonnco,
+  logoWhite,
+  logoEmail,
+  logoFB,
+  logoIG,
+  logoTiktok,
+  logoLink
+} from "../assets/img";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -60,7 +62,7 @@ const dummyCareer = {
 
 const CareerDetailPage = () => {
   const [loading, setLoading] = useState(true);
-  const [careerData, setCareerData] = useState(null);
+  const [career, setCareer] = useState(null);
   const { id } = useParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
@@ -70,12 +72,12 @@ const CareerDetailPage = () => {
   useEffect(() => {
     // Simulasi fetch API
     setTimeout(() => {
-      setCareerData(dummyCareer);
+      setCareer(dummyCareer);
       setLoading(false);
     }, 1000);
   }, [id]);
 
-  if (loading || !careerData) return <KonncoLoader />;
+  if (loading || !career) return <KonncoLoader />;
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-800">
@@ -102,29 +104,28 @@ const CareerDetailPage = () => {
           </button>
 
           <div className="text-2xl md:text-3xl font-bold mb-2">
-            {careerData.title}
+            {career.title}
           </div>
           <div className="flex items-center gap-4 py-2 text-left">
             <div className="w-10 h-10 flex items-center justify-center">
               <BiMoneyWithdraw className="text-orange-500 text-xl" />
             </div>
-            <p className="text-gray-600 m-0">{careerData.salary}</p>
+            <p className="text-gray-600 m-0">{career.salary}</p>
           </div>
           <button
-            onClick={() => (window.location.href = "/careers_apply")}
-            style={{ background: "#E86A1C" }}
-            className="font-semibold flex items-center gap-1 mt-2 group w-fit text-white mb-6 rounded-md px-4 py-2 hover:bg-orange-500 shadow-[0_4px_0_0_#b45309] transition-colors"
+            onClick={() => (window.location.href = `/careers_apply/${career.id}`)}
+            className="font-semibold flex items-center gap-1 mt-2 group w-fit text-white mb-6 rounded-md px-4 py-2 bg-orange-500 hover:bg-orange-500 shadow-[0_4px_0_0_#b45309] transition-colors"
           >
             Apply
           </button>
           <p className="mb-6 leading-relaxed text-justify">
-            {careerData.description}
+            {career.description}
           </p>
 
           <div className="font-[Plus Jakarta Sans] mb-6">
             <h2 className="font-semibold mb-2">Tanggung Jawab:</h2>
             <ul className="list-disc pl-6 text-sm leading-relaxed">
-              {careerData.responsibilities.map((item, idx) => (
+              {career.responsibilities.map((item, idx) => (
                 <li key={idx}>{item}</li>
               ))}
             </ul>
@@ -133,7 +134,7 @@ const CareerDetailPage = () => {
           <div>
             <h2 className="font-semibold mb-2">Kualifikasi:</h2>
             <ul className="list-disc pl-6 text-sm leading-relaxed">
-              {careerData.qualifications.map((item, idx) => (
+              {career.qualifications.map((item, idx) => (
                 <li key={idx}>{item}</li>
               ))}
             </ul>
@@ -145,7 +146,7 @@ const CareerDetailPage = () => {
           <div className="mb-6">
             <h3 className="font-semibold text-sm mb-2">Persyaratan</h3>
             <div className="flex flex-wrap gap-2">
-              {careerData.tags.map((tag, idx) => (
+              {career.tags.map((tag, idx) => (
                 <span
                   key={idx}
                   className="bg-orange-500 text-white px-3 py-1 rounded text-sm shadow-[0_4px_0_0_#b45309]"
@@ -159,7 +160,7 @@ const CareerDetailPage = () => {
           <div>
             <h3 className="font-semibold text-sm mb-2">Info Lainnya</h3>
             <div className="flex flex-wrap gap-2">
-              {careerData.links.map((link, idx) => (
+              {career.links.map((link, idx) => (
                 <span
                   key={idx}
                   className="border border-orange-500 px-3 py-1 rounded text-sm"
