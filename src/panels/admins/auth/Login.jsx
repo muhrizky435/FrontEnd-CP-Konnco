@@ -42,13 +42,19 @@ const AdminLogin = () => {
       const result = await response.json();
       console.log("Login result:", result);
 
-
       if (!response.ok) {
         setError(result.message || "Login gagal");
         return;
       }
 
-      localStorage.setItem("adminToken", result.data.token);
+      localStorage.setItem(
+        "adminToken",
+        JSON.stringify({
+          token: result.data.token,
+          name: result.data.name,
+        })
+      );
+
       navigate("/panels/admins/dashboard");
     } catch {
       setError("Terjadi kesalahan saat login.");

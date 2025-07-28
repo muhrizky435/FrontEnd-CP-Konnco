@@ -18,6 +18,9 @@ import BlogsAdmin from './panels/admins/blog/Blogs-Admin';
 import Detail_Blogs from './panels/admins/blog/Detail-Blogs-Admin';
 import Edit_Blogs from './panels/admins/blog/Edit-Blogs-Admin';
 import Add_Blogs from './panels/admins/blog/Add-Blogs-Admin';
+import Product_Admin from './panels/admins/product/Product-Admin';
+import Detail_Product_Admin from './panels/admins/product/Detail-Product-Admin';
+// import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
 
 // Guard component
 const AdminGuard = ({ children }) => {
@@ -33,7 +36,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/product" element={<Product />} />
-        <Route path="/detail_product/:id" element={<Detail_Product />} />
+        <Route path="/detail_product/:productId" element={<Detail_Product />} />
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/detail_blogs/:slug" element={<Detail_blogs />} />
         <Route path="/contact" element={<Contact />} />
@@ -63,6 +66,15 @@ function App() {
         <Route path="/panels/admins/blogs/add_blogs" element={
           <AdminGuard><Add_Blogs /></AdminGuard>
         } />
+        <Route path="/panels/admins/product" element={
+          <AdminGuard><Product_Admin /></AdminGuard>
+        } />
+        <Route path="/panels/admins/product/detail/:id" element={
+          <AdminGuard><Detail_Product_Admin /></AdminGuard>
+        } />
+        {/* <Route path="/panels/admins/product/edit/:id" element={
+          <AdminGuard><Edit_Product_Admin /></AdminGuard>
+        } /> */}
       </Routes>
     </Router>
   );

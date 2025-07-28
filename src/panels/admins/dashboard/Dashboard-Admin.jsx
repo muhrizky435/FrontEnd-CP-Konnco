@@ -15,7 +15,9 @@ const DashboardAdmin = () => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const adminData = JSON.parse(localStorage.getItem("adminToken"));
+        const token = adminData?.token;
+
         const response = await fetch(
           "http://localhost:3000/api/v1/admins/dashboard/overview",
           {
@@ -27,7 +29,7 @@ const DashboardAdmin = () => {
 
         const result = await response.json();
         if (!response.ok) throw new Error(result.message);
-
+        console.log("DASHBOARD DATA", result);
         setOverviewData(result.data);
       } catch (err) {
         console.error("Gagal mengambil data overview:", err.message);
@@ -43,9 +45,14 @@ const DashboardAdmin = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
-      <AdminSidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+      <AdminSidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
       <div className="md:ml-60 flex-1 flex flex-col">
-        <AdminNavbar onToggleSidebar={() => setIsSidebarOpen(prev => !prev)} />
+        <AdminNavbar
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        />
         <main className="px-4 sm:px-6 md:px-4 py-6">
           <h1 className="text-xl font-bold mb-6 text-left">Overview</h1>
 
@@ -68,7 +75,9 @@ const DashboardAdmin = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-[5fr_2fr] gap-3">
             <div className="bg-white border border-gray-400 rounded-lg p-4">
-              <h2 className="font-bold text-lg mb-4 text-left">Aktivitas Terkini</h2>
+              <h2 className="font-bold text-lg mb-4 text-left">
+                Aktivitas Terkini
+              </h2>
               <h3 className="text-sm font-semibold mb-4 text-left">Blog</h3>
               <hr />
               <table className="min-w-full text-sm">
@@ -82,11 +91,16 @@ const DashboardAdmin = () => {
                 </thead>
                 <tbody>
                   {overviewData?.findBlogData?.map((blog) => (
-                    <tr key={blog.slug} className="border-t p-4 place-items-center gap-4">
+                    <tr
+                      key={blog.slug}
+                      className="border-t p-4 gap-4 font-medium"
+                    >
                       <td className="py-2 px-2 text-left">{blog.title}</td>
-                      <td className="py-2 px-2 text-center">{blog.author.name}</td>
+                      <td className="py-2 px-2 text-center">
+                        {blog.author.name}
+                      </td>
                       <td>
-                        <span className="bg-orange-500 text-white text-xs px-1 py-1 rounded-md">
+                        <span className="bg-orange-500 text-white text-xs px-1 py-1 ms-20 rounded-md">
                           {blog.type}
                         </span>
                       </td>
@@ -94,7 +108,9 @@ const DashboardAdmin = () => {
                         <div className="flex gap-3 justify-center pb-3 pt-3">
                           <button
                             onClick={() =>
-                              navigate(`/panels/admins/blogs/detail_blogs/${blog.slug}`)
+                              navigate(
+                                `/panels/admins/blogs/detail_blogs/${blog.slug}`
+                              )
                             }
                             className="bg-[#4731D8] text-white text-xs hover:bg-[#291f69] px-2 py-2 rounded-md"
                           >
@@ -102,7 +118,9 @@ const DashboardAdmin = () => {
                           </button>
                           <button
                             onClick={() =>
-                              navigate(`/panels/admins/blogs/edit_blogs/${blog.slug}`)
+                              navigate(
+                                `/panels/admins/blogs/edit_blogs/${blog.slug}`
+                              )
                             }
                             className="bg-green-500 text-white text-xs hover:bg-green-800 px-2 py-2 rounded-md"
                           >
@@ -110,7 +128,9 @@ const DashboardAdmin = () => {
                           </button>
                           <button
                             onClick={() =>
-                              navigate(`/panels/admins/blogs/delete_blogs/${blog.slug}`)
+                              navigate(
+                                `/panels/admins/blogs/delete_blogs/${blog.slug}`
+                              )
                             }
                             className="bg-red-500 text-white text-xs hover:bg-red-800 px-2 py-2 rounded-md"
                           >
@@ -122,7 +142,7 @@ const DashboardAdmin = () => {
                   ))}
                 </tbody>
               </table>
-              <div className="flex justify-left mt-2 mb-2">
+              <div className="flex justify-left mt-4 mb-2">
                 <button
                   onClick={() => navigate("/panels/admins/blogs")}
                   className="font-semibold flex gap-1 group w-fit text-[#E86A1C] hover:text-[#F77F4D] transition-colors"
@@ -145,8 +165,10 @@ const DashboardAdmin = () => {
           </div>
 
           <div className="bg-white border border-gray-400 rounded-lg p-4 mt-6 justify-left">
-            <h3 className="text-lg font-semibold mb-4 text-left">Lamaran Masuk</h3>
-            <table className="w-full text-sm table-fixed">
+            <h3 className="text-lg font-semibold mb-4 text-left">
+              Lamaran Masuk
+            </h3>
+            <table className="w-full text-sm table-fixed font-medium">
               <thead>
                 <tr className="text-left text-gray-600">
                   <th className="w-2/4 py-2">Pelamar</th>
@@ -158,7 +180,9 @@ const DashboardAdmin = () => {
                 {overviewData?.findApplicationData?.map((application) => (
                   <tr key={application.id} className="border-t text-left">
                     <td className="py-2">{application.applicantName}</td>
-                    <td className="px-16">{application.career?.title || "Posisi tidak tersedia"}</td>
+                    <td className="px-16">
+                      {application.career?.title || "Posisi tidak tersedia"}
+                    </td>
                     <td>
                       <button
                         onClick={() =>

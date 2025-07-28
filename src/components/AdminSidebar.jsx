@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,12 +26,22 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   const closeSidebar = () => setIsSidebarOpen(false);
 
+  const [adminName, setAdminName] = useState("Admin");
+
+  useEffect(() => {
+    const admin = JSON.parse(localStorage.getItem("admin"));
+    if (admin?.name) {
+      setAdminName(admin.name);
+    }
+  }, []);
+
   const SidebarContent = () => (
     <div className="h-full bg-white border-r w-56 p-4 space-y-2 px-2">
       <div className="mb-8">
         <p className="text-gray-600 text-md">
-          Halo, <span className="font-bold text-black">Lorem</span>
+          Halo, <span className="font-bold text-black">{adminName}</span>
         </p>
+
         <div className="text-gray-400 text-sm mb-2">Admin</div>
         <hr className="my-2" />
         <button

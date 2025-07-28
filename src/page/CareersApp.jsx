@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { useInView } from "react-intersection-observer";
+import { motion } from "framer-motion";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
-import { motion } from "framer-motion";
 import {
   logoKonnco,
   logoWhite,
@@ -15,51 +14,37 @@ import {
   logoLink,
 } from "../assets/img";
 
-void motion;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
-const fadeLeft = {
-  hidden: { opacity: 0, x: -40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut" } },
-};
-const fadeRight = {
-  hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut" } },
-};
 
 const Careers = () => {
   const [loading, setLoading] = useState(true);
+  const [careers, setCareers] = useState([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0 });
 
-  // Simulasi loader
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchCareers = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/v1/careers");
+        const result = await res.json();
+        if (res.ok && result.data) {
+          setCareers(result.data);
+        } else {
+          console.error("Gagal ambil data karir:", result.message);
+        }
+      } catch (err) {
+        console.error("Error saat fetch careers:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Dummy data untuk karir (nanti bisa diganti dengan fetch API)
-  const careers = [
-    {
-      id: 1,
-      title: "Full-Stack Developer (JavaScript, React)",
-      summary:
-        "Kami sedang mencari Full-Stack Developer yang berpengalaman untuk bergabung dengan tim teknologi kami...",
-      tags: ["Active", "Fulltime", "Coding", "Website"],
-      image: "/img/Code.png",
-    },
-    {
-      id: 2,
-      title: "Mobile Developer (React Native)",
-      summary:
-        "Kami mencari seorang Mobile Developer – React Native yang berdedikasi dan berpengalaman untuk membangun serta mengembangkan aplik...",
-      tags: ["Active", "Fulltime", "Coding", "Mobile"],
-      image: "/img/Mobile.png",
-    },
-  ];
+    fetchCareers();
+  }, []);
 
   if (loading) return <KonncoLoader />;
 
@@ -67,12 +52,10 @@ const Careers = () => {
     <div className="min-h-screen bg-white font-sans">
       <KonncoNavbar
         fadeUp={fadeUp}
-        fadeLeft={fadeLeft}
-        fadeRight={fadeRight}
-        logoKonnco={logoKonnco}
         drawerOpen={drawerOpen}
         setDrawerOpen={setDrawerOpen}
         drawerRef={drawerRef}
+        logoKonnco={logoKonnco}
       />
       <main className="px-4 md:px-10 lg:px-24 pt-4 pb-20">
         <motion.div
@@ -105,7 +88,7 @@ const Careers = () => {
             >
               <div className="bg-orange-500 w-full md:w-1/4 aspect-square md:aspect-auto md:h-auto flex items-center justify-center p-4">
                 <img
-                  src={career.image}
+                  src="/img/Code.png" // Bisa kamu sesuaikan, atau nanti dynamic
                   alt="gambar"
                   className="w-16 h-16 md:w-24 md:h-24 object-contain"
                 />
@@ -115,27 +98,32 @@ const Careers = () => {
                   {career.title}
                 </h2>
                 <p className="text-gray-600 text-sm md:text-base mb-3">
-                  {career.summary}
+                  {career.description}
                 </p>
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {career.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-md shadow-[0_4px_0_0_#b45309]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {career.tags &&
+                    career.tags.split(",").map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-md shadow-[0_4px_0_0_#b45309]"
+                      >
+                        {tag.trim()}
+                      </span>
+                    ))}
                 </div>
                 <div className="flex gap-3">
                   <button
-                    onClick={() => (window.location.href = `/careers_apply/${career.id}`)}
+                    onClick={() =>
+                      (window.location.href = `/careers_apply/${career.id}`)
+                    }
                     className="bg-[#E86A1C] font-bold flex items-center gap-1 mt-2 group w-fit text-white rounded-lg px-6 py-2 hover:bg-[#F77F4D] shadow-[0_4px_0_0_#b45309] transition-colors"
                   >
                     Apply
                   </button>
                   <button
-                    onClick={() => (window.location.href = "detail_careers")}
+                    onClick={() =>
+                      (window.location.href = `/detail_careers/${career.id}`)
+                    }
                     className="bg-white font-bold flex items-center gap-1 mt-2 group w-fit text-black rounded-lg px-6 py-2 hover:bg-gray-300 border border-black shadow-[0_4px_0_0_gray] transition-colors"
                   >
                     Lihat Detail
@@ -152,8 +140,6 @@ const Careers = () => {
 
       <KonncoFooter
         fadeUp={fadeUp}
-        fadeLeft={fadeLeft}
-        fadeRight={fadeRight}
         footerRef={footerRef}
         footerInView={footerInView}
         logoWhite={logoWhite}
@@ -166,5 +152,6 @@ const Careers = () => {
     </div>
   );
 };
+void motion;
 
 export default Careers;
