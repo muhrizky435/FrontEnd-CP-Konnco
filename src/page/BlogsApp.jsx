@@ -16,7 +16,6 @@ import {
   logoLink,
 } from "../assets/img";
 
-
 void motion;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -47,16 +46,16 @@ function BlogsApp() {
         const formatted = data.map((blogs) => ({
           id: blogs.id,
           title: blogs.title || "Judul tidak tersedia",
-          author: blogs.author?.name || "Admin",
+          author: blogs.author?.name,
           date: blogs.createdAt
             ? new Date(blogs.createdAt).toISOString().split("T")[0]
             : "Tanggal tidak tersedia",
-          category: blogs.category || "TECH",
+          type: blogs.type,
           image_url: blogs.photo
             ? `http://localhost:3000${blogs.photo}`
-            : "https://source.unsplash.com/800x400/?technology",
-          desc: blogs.description
-            ? blogs.description.slice(0, 120) + "..."
+            : "/img/default-image.png",
+          content: blogs.content
+            ? blogs.content.slice(0, 120) + "..."
             : "Tidak ada deskripsi.",
           slug: blogs.slug,
         }));
@@ -98,7 +97,7 @@ function BlogsApp() {
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 mt-2">
               Konnco Blogs
             </h1>
-            <p className="text-gray-900 max-w-2xl mx-auto text-sm md:text-base text-center">
+            <p className="text-gray-700 text-base md:text-lg max-w-2xl mx-auto text-center">
               Kami percaya bahwa berbagi wawasan adalah bagian penting dari
               pengembangan teknologi yang berkelanjutan. Melalui blog ini, kami
               membagikan berbagai artikel. studi kasus, dan tips seputar
@@ -119,13 +118,10 @@ function BlogsApp() {
                 }}
               >
                 {/* Image */}
-                <div
-                  className="w-full h-48 bg-center bg-cover"
-                  style={{
-                    backgroundImage: blog.image_url
-                      ? `url(${blog.image_url})`
-                      : `url("data:image/svg+xml;utf8,<svg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'><rect width='100%25' height='100%25' fill='%23f3f3f3'/><rect x='0' y='0' width='100%25' height='100%25' fill='none' stroke='%23d1d5db' stroke-width='2' stroke-dasharray='8 4'/></svg>")`,
-                  }}
+                <img
+                  src={blog.image_url || "/img/default-image.png"}
+                  alt={blog.title}
+                  className="w-full h-48 object-cover"
                 />
 
                 <div className="p-5 flex flex-col flex-1">
@@ -160,8 +156,8 @@ function BlogsApp() {
                     </span>
                   </div>
 
-                  <div className="block w-14 px-1 py-1 bg-orange-500 text-white text-xs font-semibold rounded mb-2 mt-2">
-                    {blog.category}
+                  <div className="inline-block px-2 py-1 bg-orange-500 text-white text-xs font-semibold rounded mb-2 mt-2 w-fit">
+                    {blog.type}
                   </div>
 
                   <div className="font-bold text-black text-base mb-2 leading-snug text-justify">
@@ -169,7 +165,7 @@ function BlogsApp() {
                   </div>
 
                   <div className="text-gray-700 text-sm mb-4 flex-1 text-justify">
-                    {blog.desc}
+                    {blog.content}
                   </div>
 
                   <Link

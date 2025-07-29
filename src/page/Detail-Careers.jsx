@@ -5,6 +5,7 @@ import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
 import { BiMoneyWithdraw } from "react-icons/bi";
+import api from "../api/axios";
 import {
   logoKonnco,
   logoWhite,
@@ -12,8 +13,9 @@ import {
   logoFB,
   logoIG,
   logoTiktok,
-  logoLink
+  logoLink,
 } from "../assets/img";
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -28,54 +30,42 @@ const fadeRight = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut" } },
 };
 
-//  dummy nanti bisa diganti dengan fetch API
-const dummyCareer = {
-  id: 1,
-  title: "Full-Stack Developer (JavaScript, React)",
-  salary: "Rp3.800.000 - Rp4.000.000 / Bulan",
-  description:
-    "Kami sedang mencari Full-Stack Developer yang berpengalaman untuk bergabung dengan tim teknologi kami...",
-  responsibilities: [
-    "Merancang, mengembangkan, dan memelihara fitur front-end dan back-end aplikasi web.",
-    "Mengintegrasikan API dan memastikan komunikasi antar sistem berjalan optimal.",
-    "Berkoordinasi dengan tim UI/UX, produk, dan QA untuk menghasilkan pengalaman pengguna yang baik.",
-    "Menyusun dokumentasi teknis dan melakukan review kode.",
-    "Menerapkan praktik terbaik dalam pengembangan perangkat lunak.",
-    "Mengidentifikasi serta menyelesaikan bug atau permasalahan teknis secara proaktif.",
-  ],
-  qualifications: [
-    "Mengidentifikasi serta menyelesaikan bug atau permasalahan teknis secara proaktif.",
-    "Pengalaman minimal 1 tahun sebagai Full-Stack Developer.",
-    "Menguasai JavaScript/TypeScript dan framework seperti React.",
-    "Memiliki pemahaman database relasional dan non-relasional.",
-    "Menguasai pengembangan back-end menggunakan Node.js.",
-    "Memahami prinsip RESTful API dan arsitektur microservices.",
-    "Terbiasa menggunakan Git dan tools kolaborasi.",
-  ],
-  tags: [
-    "Fulltime/On-Site",
-    "Minimal Diploma (D1–D4)",
-    "Pengalaman minimal 1 tahun",
-  ],
-  links: ["LinkedIn", "JobStreet", "Glints"],
-};
-
 const CareerDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [career, setCareer] = useState(null);
-  const { id } = useParams();
+  const { careerId } = useParams();
+  // console.log("Career ID dari URL:", careerId);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef(null);
-
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0 });
 
   useEffect(() => {
-    // Simulasi fetch API
-    setTimeout(() => {
-      setCareer(dummyCareer);
-      setLoading(false);
-    }, 1000);
-  }, [id]);
+    const fetchCareer = async () => {
+      try {
+        const res = await api.get(`/careers/${careerId}`);
+        const data = res.data.data;
+
+        setCareer({
+          ...data,
+          requirements: data.requirements
+            ? data.requirements.split("\n").filter((r) => r.trim() !== "")
+            : [],
+          links: [
+            data.linkedInInfo || null,
+            data.jobStreetInfo || null,
+            data.glintsInfo || null,
+          ].filter(Boolean),
+          tags: [], 
+        });
+      } catch (err) {
+        console.error("Failed to fetch career:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCareer();
+  }, [careerId]);
 
   if (loading || !career) return <KonncoLoader />;
 
@@ -113,7 +103,7 @@ const CareerDetailPage = () => {
             <p className="text-gray-600 m-0">{career.salary}</p>
           </div>
           <button
-            onClick={() => (window.location.href = `/careers_apply/${career.id}`)}
+            onClick={() => (window.location.href = `/careers_apply/${careerId}`)}
             className="font-semibold flex items-center gap-1 mt-2 group w-fit text-white mb-6 rounded-md px-4 py-2 bg-orange-500 hover:bg-orange-500 shadow-[0_4px_0_0_#b45309] transition-colors"
           >
             Apply
@@ -122,54 +112,51 @@ const CareerDetailPage = () => {
             {career.description}
           </p>
 
-          <div className="font-[Plus Jakarta Sans] mb-6">
-            <h2 className="font-semibold mb-2">Tanggung Jawab:</h2>
-            <ul className="list-disc pl-6 text-sm leading-relaxed">
-              {career.responsibilities.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="font-semibold mb-2">Kualifikasi:</h2>
-            <ul className="list-disc pl-6 text-sm leading-relaxed">
-              {career.qualifications.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          {career.requirements.length > 0 && (
+            <div className="font-[Plus Jakarta Sans] mb-6">
+              <h2 className="font-semibold mb-2">Persyaratan:</h2>
+              <ul className="list-disc pl-6 text-sm leading-relaxed">
+                {career.requirements.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}
         <div className="w-full md:w-80">
-          <div className="mb-6">
-            <h3 className="font-semibold text-sm mb-2">Persyaratan</h3>
-            <div className="flex flex-wrap gap-2">
-              {career.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="bg-orange-500 text-white px-3 py-1 rounded text-sm shadow-[0_4px_0_0_#b45309]"
-                >
-                  {tag}
-                </span>
-              ))}
+          {career.tags && career.tags.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-sm mb-2">Persyaratan</h3>
+              <div className="flex flex-wrap gap-2">
+                {career.tags.map((tag, idx) => (
+                  <span
+                    key={idx}
+                    className="bg-orange-500 text-white px-3 py-1 rounded text-sm shadow-[0_4px_0_0_#b45309]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div>
-            <h3 className="font-semibold text-sm mb-2">Info Lainnya</h3>
-            <div className="flex flex-wrap gap-2">
-              {career.links.map((link, idx) => (
-                <span
-                  key={idx}
-                  className="border border-orange-500 px-3 py-1 rounded text-sm"
-                >
-                  {link}
-                </span>
-              ))}
+          {career.links.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-sm mb-2">Info Lainnya</h3>
+              <div className="flex flex-wrap gap-2">
+                {career.links.map((link, idx) => (
+                  <span
+                    key={idx}
+                    className="border border-orange-500 px-3 py-1 rounded text-sm"
+                  >
+                    {link}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 

@@ -41,7 +41,7 @@ function App() {
         <Route path="/detail_blogs/:slug" element={<Detail_blogs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/careers" element={<Careers />} />
-        <Route path="/detail_careers" element={<Detail_Careers />} />
+        <Route path="/detail_careers/:careerId" element={<Detail_Careers />} />
         <Route path="/careers_apply/:careerId" element={<Careers_Apply />} />
         <Route path="/thanks" element={<ThanksApp />} />
 

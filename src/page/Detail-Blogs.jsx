@@ -79,23 +79,18 @@ function DetailBlogs() {
           Kembali
         </button>
 
-        {blogs.photo ? (
-          <motion.img
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            src={`http://localhost:3000/api/v1/blogs/${blogs.photo}`}
-            alt={blogs.title}
-            className="w-full h-[300px] object-cover mb-6 rounded"
-          />
-        ) : (
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="bg-gray-200 w-full h-[300px] mb-6 rounded"
-          ></motion.div>
-        )}
+        <motion.img
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          src={
+            blogs.photo
+              ? `http://localhost:3000/api/v1/blogs/${blogs.photo}`
+              : "/img/default-image.png"
+          }
+          alt={blogs.title}
+          className="w-full h-[300px] object-cover mb-6 rounded"
+        />
 
         <motion.div
           initial="hidden"
@@ -146,7 +141,7 @@ function DetailBlogs() {
           animate="visible"
           variants={fadeUp}
           className="text-gray-700 leading-relaxed space-y-5 text-justify"
-          dangerouslySetInnerHTML={{ __html: blogs.description }}
+          dangerouslySetInnerHTML={{ __html: blogs.content }}
         />
 
         <motion.div
@@ -164,17 +159,19 @@ function DetailBlogs() {
           variants={fadeUp}
           className="flex flex-wrap gap-3 mt-4 mb-4"
         >
-          {["WhatsApp", "Instagram", "Tiktok", "X", "Facebook"].map((platform) => (
-            <a
-              key={platform}
-              href={`https://www.${platform.toLowerCase()}.com/`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-white bg-orange-500 hover:bg-orange-600 text-sm font-semibold py-2 px-4 rounded-md border border-orange-700 transition"
-            >
-              {platform}
-            </a>
-          ))}
+          {["WhatsApp", "Instagram", "Tiktok", "X", "Facebook"].map(
+            (platform) => (
+              <a
+                key={platform}
+                href={`https://www.${platform.toLowerCase()}.com/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white bg-orange-500 hover:bg-orange-600 text-sm font-semibold py-2 px-4 rounded-md border border-orange-700 transition"
+              >
+                {platform}
+              </a>
+            )
+          )}
         </motion.div>
       </main>
 
