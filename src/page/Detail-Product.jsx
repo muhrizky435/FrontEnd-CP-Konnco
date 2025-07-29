@@ -37,7 +37,6 @@ const ProductDetailPage = () => {
         const response = await axios.get(
           `http://localhost:3000/api/v1/products/${productId}`
         );
-        // console.log("DATA PRODUK DARI API:", response.data);
         setProductData(response.data.data);
       } catch (error) {
         console.error("Gagal mengambil data produk:", error);
@@ -59,10 +58,12 @@ const ProductDetailPage = () => {
     ? productData.advantage.split(",").map((item) => item.trim())
     : [];
 
-  // const thirdPhotoList = productData.thirdPhoto
-  // ? productData.thirdPhoto.split(",").map(item => item.trim()).filter(Boolean)
-  // : [];
-
+  const mainPhotoSrc = productData.mainPhoto || "/img/default.jpeg";
+  const secondPhotoSrc = productData.secondPhoto || "/img/default.jpeg";
+  const thirdPhotos =
+    Array.isArray(productData.thirdPhoto) && productData.thirdPhoto.length > 0
+      ? productData.thirdPhoto
+      : ["/img/default.jpeg"];
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-white font-sans">
@@ -86,37 +87,36 @@ const ProductDetailPage = () => {
         </button>
 
         {/* Gambar utama */}
-        {productData.mainPhoto ? (
-          <motion.img
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            src={productData.mainPhoto}
-            alt={productData.title}
-            className="w-full h-64 md:h-[450px] object-cover rounded-xl mb-6"
-          />
-        ) : (
-          <div className="bg-gray-200 w-full h-64 md:h-[450px] rounded-xl mb-6"></div>
-        )}
+        <motion.img
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          src={mainPhotoSrc}
+          alt={productData.title}
+          className="w-full h-64 md:h-[450px] object-cover rounded-xl mb-6"
+        />
 
         {/* Gambar kecil */}
-        {productData.secondPhoto && Array.isArray(productData.thirdPhoto) && productData.thirdPhoto.length > 0 && (
-          <motion.div
-            className="grid grid-cols-2 gap-4 mb-10"
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            {productData.thirdPhoto.map((img, idx) => (
-              <img
-                key={idx}
-                src={img}
-                alt={`Thumbnail ${idx + 1}`}
-                className="h-40 object-cover rounded-xl w-full"
-              />
-            ))}
-          </motion.div>
-        )}
+        <motion.div
+          className="grid grid-cols-2 gap-4 mb-10"
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+        >
+          <img
+            src={secondPhotoSrc}
+            alt="Second Photo"
+            className="h-40 object-cover rounded-xl w-full"
+          />
+          {thirdPhotos.map((img, idx) => (
+            <img
+              key={idx}
+              src={img || "/default.jpeg"}
+              alt={`Thumbnail ${idx + 1}`}
+              className="h-40 object-cover rounded-xl w-full"
+            />
+          ))}
+        </motion.div>
 
         <motion.div
           initial="hidden"
@@ -140,19 +140,19 @@ const ProductDetailPage = () => {
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <h2 className="text-lg font-semibold mb-2">Fitur Utama:</h2>
             <ul className="list-decimal list-inside text-gray-700 space-y-1">
-            {featureList.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
+              {featureList.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
           </motion.div>
 
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
             <h2 className="text-lg font-semibold mb-2">Keunggulan:</h2>
             <ul className="list-decimal list-inside text-gray-700 space-y-1">
-            {advantageList.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
+              {advantageList.map((item, idx) => (
+                <li key={idx}>{item}</li>
+              ))}
+            </ul>
           </motion.div>
         </div>
       </main>

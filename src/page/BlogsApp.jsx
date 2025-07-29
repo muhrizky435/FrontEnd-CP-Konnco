@@ -41,7 +41,7 @@ function BlogsApp() {
     api
       .get("/blogs")
       .then((res) => {
-        console.log("RESPON BLOG:", res.data);
+        // console.log("RESPON BLOG:", res.data);
         const data = res.data?.data || [];
         const formatted = data.map((blogs) => ({
           id: blogs.id,

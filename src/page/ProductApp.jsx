@@ -76,47 +76,58 @@ function ProductApp() {
           </motion.div>
 
           <div className="flex flex-col gap-8">
-            {products.map((product, idx) => (
-              <motion.div
-                key={product.id}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.2 }}
-                variants={fadeUp}
-                className={`flex flex-col md:flex-row items-stretch md:min-h-[360px] md:h-[360px] rounded-2xl shadow-[5px_5px_15px_rgba(0,0,0,0.4)] overflow-hidden bg-white text-justify
-                ${idx % 2 === 1 ? "md:flex-row-reverse" : ""}`}
-              >
-                {/* Image Section */}
-                <div className="w-full md:w-1/2 h-64 md:h-full">
-                  <img
-                    src={product.mainPhoto ? product.mainPhoto : "/default-image.jpg"}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+            {products.map((product, idx) => {
 
-                {/* Content Section */}
-                <div className="w-full md:w-1/2 flex flex-col justify-between p-6 md:p-8 md:h-full">
-                  <div className="flex-grow">
-                    <h2 className="text-xl md:text-2xl font-bold mb-2 text-black">
-                      {product.title}
-                    </h2>
-                    <div className="text-gray-700 text-base md:text-lg leading-relaxed mb-4 line-clamp-4">
-                      {product.description}
-                    </div>
+              const imageSrc =
+                product.mainPhoto &&
+                product.mainPhoto.trim() !== "" &&
+                product.mainPhoto !== "default-photo.jpg"
+                  ? `http://localhost:3000/uploads/${product.mainPhoto}`
+                  : "/img/default.jpeg";
+
+              return (
+                <motion.div
+                  key={product.id}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={fadeUp}
+                  className={`flex flex-col md:flex-row items-stretch md:min-h-[360px] md:h-[360px] rounded-2xl shadow-[5px_5px_15px_rgba(0,0,0,0.4)] overflow-hidden bg-white text-justify ${
+                    idx % 2 === 1 ? "md:flex-row-reverse" : ""
+                  }`}
+                >
+                  {/* Image Section */}
+                  <div className="w-full md:w-1/2 h-64 md:h-full">
+                    <img
+                      src={imageSrc}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <a
-                    href={`detail_product/${product.id}`}
-                    className="group flex gap-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg shadow-[5px_5px_20px_rgba(0,0,0,0.4)] w-fit transition"
-                  >
-                    Lihat Detail
-                    <span className="group-hover:translate-x-1 transition-transform">
-                      &rarr;
-                    </span>
-                  </a>
-                </div>
-              </motion.div>
-            ))}
+
+                  {/* Content Section */}
+                  <div className="w-full md:w-1/2 flex flex-col justify-between p-6 md:p-8 md:h-full">
+                    <div className="flex-grow">
+                      <h2 className="text-xl md:text-2xl font-bold mb-2 text-black">
+                        {product.title}
+                      </h2>
+                      <div className="text-gray-700 text-base md:text-lg leading-relaxed mb-4 line-clamp-4">
+                        {product.description}
+                      </div>
+                    </div>
+                    <a
+                      href={`detail_product/${product.id}`}
+                      className="group flex gap-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg shadow-[5px_5px_20px_rgba(0,0,0,0.4)] w-fit transition"
+                    >
+                      Lihat Detail
+                      <span className="group-hover:translate-x-1 transition-transform">
+                        &rarr;
+                      </span>
+                    </a>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
       </main>
