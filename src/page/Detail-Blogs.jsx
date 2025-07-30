@@ -105,7 +105,7 @@ function DetailBlogs() {
                 d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5Z"
               />
             </svg>
-            {blogs.author?.name || "Anonim"}
+            {blogs.author?.name}
           </span>
           <span className="inline-flex items-center gap-1 ml-3 text-justify">
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24">

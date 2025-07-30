@@ -49,12 +49,12 @@ const BlogsAdmin = () => {
           date: item.createdAt
             ? new Date(item.createdAt).toISOString().split("T")[0]
             : "Tanggal tidak tersedia",
-          category: item.category || "TECH",
+          type: item.type || "TECH",
           image_url: item.photo
             ? `http://localhost:3000${item.photo}`
             : "https://source.unsplash.com/800x400/?technology",
-          desc: item.description
-            ? item.description.slice(0, 120) + "..."
+          content: item.content
+            ? item.content.slice(0, 120) + "..."
             : "Tidak ada deskripsi.",
           slug: item.slug,
         }));
@@ -114,14 +114,14 @@ const BlogsAdmin = () => {
                 <p className="text-xs text-gray-700 mb-2 text-left">
                   {blog.date}
                 </p>
-                <span className="w-12 block text-left text-xs bg-orange-500 text-white font-semibold px-2 py-1 rounded-md mb-2">
-                  {blog.category}
+                <span className="inline-block text-left text-xs bg-orange-500 text-white font-semibold px-2 py-1 rounded-md mb-2 w-fit">
+                  {blog.type}
                 </span>
                 <h2 className="text-md md:text-lg font-semibold mb-2 text-justify">
                   {blog.title}
                 </h2>
                 <p className="text-sm text-gray-700 mb-4 text-justify">
-                  {blog.desc}
+                  {blog.content}
                 </p>
                 <div className="flex gap-2 justify-start pt-2 flex-wrap">
                   <button

@@ -9,17 +9,19 @@ import useBreadcrumb from "../../../components/Breadcrumb";
 const Add_Blog_Admin = () => {
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     author: "",
     date: "",
-    category: "TECH",
-    image_url: "",
+    type: "TECH",
     content: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
+  const breadcrumb = useBreadcrumb("memuat...");
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 800);
@@ -36,7 +38,6 @@ const Add_Blog_Admin = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prev) => ({ ...prev, image_url: reader.result }));
         setImagePreview(reader.result);
       };
       reader.readAsDataURL(file);
@@ -47,30 +48,41 @@ const Add_Blog_Admin = () => {
     e.preventDefault();
     console.log("HANDLE SUBMIT DIPANGGIL ✅");
 
+    const imageFile = document.getElementById("fileInput").files[0];
+    if (!imageFile) {
+      alert("Mohon unggah gambar terlebih dahulu.");
+      return;
+    }
+
+    console.info(formData);
+    console.info(imageFile);
+
     const form = new FormData();
     form.append("title", formData.title);
-    form.append("description", formData.content);
-    form.append("authorId", "admin-1");
-    form.append("photo", document.getElementById("fileInput").files[0]);
+    form.append("slug", formData.slug);
+    form.append("type", formData.type);
+    form.append("date", formData.date);
+    form.append("content", formData.content);
+    form.append("photo", imageFile);
+    form.append("authorId", "2bdc5646-0bad-484a-981a-50ce5a1b9b8a");
+
+    console.info(form);
 
     try {
-      const res = await api.post("/blogs", form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
+      const res = await api.post("/admins/blogs", form);
       console.log("Blog berhasil:", res.data);
       setSuccess(true);
       setTimeout(() => {
         navigate("/panels/admins/blogs");
       }, 1500);
     } catch (err) {
-      console.error("Gagal submit blog:", err.response?.data || err.message);
+      if (err.response?.data) {
+        console.error("Gagal submit blog:", err.response.data);
+      } else {
+        console.error("Error tidak diketahui:", err.message);
+      }
     }
   };
-
-  const breadcrumb = useBreadcrumb("memuat...");
 
   if (loading) return <KonncoLoader />;
 
@@ -85,7 +97,6 @@ const Add_Blog_Admin = () => {
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
         <main className="px-4 sm:px-6 md:px-16 py-8 w-full">
-          {/* Breadcrumb */}
           <div className="text-sm text-gray-400 mb-4 text-left">
             {breadcrumb}
           </div>
@@ -101,7 +112,11 @@ const Add_Blog_Admin = () => {
             Kembali
           </button>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+            encType="multipart/form-data"
+          >
             {/* Thumbnail Upload */}
             <div>
               <label className="block text-md font-semibold mb-2 text-left">
@@ -147,6 +162,40 @@ const Add_Blog_Admin = () => {
               />
             </div>
 
+            {/* Slug */}
+            <div>
+              <label className="block text-sm font-semibold mb-1 text-left">
+                Slug
+              </label>
+              <input
+                type="text"
+                name="slug"
+                value={formData.slug}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded"
+                required
+              />
+            </div>
+
+            {/* Tipe Blog */}
+            <div>
+              <label className="block text-sm font-semibold mb-1 text-left">
+                Tipe
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded"
+              >
+                <option value="TECH">TECH</option>
+                <option value="BUSINESS">BUSINESS</option>
+                <option value="NEWS">NEWS</option>
+                <option value="TUTORIAL">TUTORIAL</option>
+                <option value="OTHER">OTHER</option>
+              </select>
+            </div>
+
             {/* Penulis & Tanggal */}
             <div className="flex gap-4">
               <div className="flex-1">
@@ -159,7 +208,6 @@ const Add_Blog_Admin = () => {
                   value={formData.author}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded"
-                  required
                 />
               </div>
               <div className="flex-1">
@@ -172,7 +220,6 @@ const Add_Blog_Admin = () => {
                   value={formData.date}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded"
-                  required
                 />
               </div>
             </div>
@@ -197,7 +244,7 @@ const Add_Blog_Admin = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="bg-orange-500 text-white font-semibold px-6 py-2 rounded hover:bg-orange-600 border border-black shadow-[0_4px_0_0_#b45309] "
+                className="bg-orange-500 text-white font-semibold px-6 py-2 rounded hover:bg-orange-600 border border-black shadow-[0_4px_0_0_#b45309]"
               >
                 Tambah
               </button>
@@ -205,6 +252,7 @@ const Add_Blog_Admin = () => {
           </form>
         </main>
       </div>
+
       {success && (
         <div className="fixed top-8 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-bounce">
           ✅ Blog berhasil ditambahkan!
