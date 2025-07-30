@@ -13,20 +13,29 @@ const Detail_Blog = () => {
   const { slug } = useParams();
 
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const response = await api.get(`/admins/blogs/${slug}`);
-        setArticleData(response.data.data);
-      } catch (error) {
-        console.error("Gagal memuat blog:", error);
-        alert("Gagal memuat blog.");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchBlog = async () => {
+    try {
+      const response = await api.get(`/admins/blogs/${slug}`);
+      const data = response.data.data;
 
-    fetchBlog();
-  }, [slug]);
+      if (data.photo) {
+        data.image_url = `http://localhost:3000/blogs/${data.photo}`;
+      } else {
+        data.image_url = null;
+      }
+
+      setArticleData(data);
+    } catch (error) {
+      console.error("Gagal memuat blog:", error);
+      alert("Gagal memuat blog.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchBlog();
+}, [slug]);
+
 
   const breadcrumb = useBreadcrumb(articleData?.title || "Memuat...");
 
