@@ -6,7 +6,6 @@ import KonncoLoader from "../../../components/KonncoLoader";
 import { FaFilter } from "react-icons/fa";
 import api from "../../../api/axios";
 
-
 const BlogsAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -14,33 +13,11 @@ const BlogsAdmin = () => {
   const location = useLocation();
   const [blogs, setBlogs] = useState([]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timeout);
-  }, []);
-
-  const generateBreadcrumb = () => {
-    const pathParts = location.pathname.split("/").filter(Boolean);
-    return pathParts.map((part, idx) => {
-      const isLast = idx === pathParts.length - 1;
-      const label = part.replaceAll("-", " ").replaceAll("_", " ");
-      return (
-        <span
-          key={idx}
-          className={isLast ? "text-orange-500" : "text-gray-400"}
-        >
-          {idx > 0 && " / "}
-          {label.charAt(0).toUpperCase() + label.slice(1)}
-        </span>
-      );
-    });
-  };
-
-  useEffect(() => {
+  const fetchBlogs = () => {
+    setLoading(true);
     api
       .get("/blogs")
       .then((res) => {
-        console.log("RESPON BLOG:", res.data);
         const data = res.data?.data || [];
         const formatted = data.map((item) => ({
           id: item.slug,
@@ -64,7 +41,44 @@ const BlogsAdmin = () => {
         console.error("Gagal ambil blog:", err.response?.data || err.message);
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchBlogs();
   }, []);
+
+  const generateBreadcrumb = () => {
+    const pathParts = location.pathname.split("/").filter(Boolean);
+    return pathParts.map((part, idx) => {
+      const isLast = idx === pathParts.length - 1;
+      const label = part.replaceAll("-", " ").replaceAll("_", " ");
+      return (
+        <span
+          key={idx}
+          className={isLast ? "text-orange-500" : "text-gray-400"}
+        >
+          {idx > 0 && " / "}
+          {label.charAt(0).toUpperCase() + label.slice(1)}
+        </span>
+      );
+    });
+  };
+
+  const handleDelete = async (slug) => {
+    const confirmDelete = window.confirm(
+      "Apakah kamu yakin ingin menghapus blog ini?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/admins/blogs/${slug}`);
+      alert("Blog berhasil dihapus.");
+      fetchBlogs(); // refresh data
+    } catch (error) {
+      console.error("Gagal menghapus blog:", error);
+      alert("Gagal menghapus blog.");
+    }
+  };
 
   if (loading) return <KonncoLoader />;
 
@@ -75,9 +89,7 @@ const BlogsAdmin = () => {
         setIsSidebarOpen={setIsSidebarOpen}
       />
       <div className="flex-1 flex flex-col md:ml-48">
-        <AdminNavbar
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        />
+        <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
           {/* Breadcrumb */}
           <div className="flex items-center justify-between mb-4">
@@ -106,14 +118,12 @@ const BlogsAdmin = () => {
 
           {/* Blog Cards */}
           <div className="space-y-6">
-            {blogs.map((blog,) => (
+            {blogs.map((blog) => (
               <div
                 key={blog.slug}
                 className="bg-white border border-black rounded-xl px-6 py-4 shadow-[0_6px_0_0_gray]"
               >
-                <p className="text-xs text-gray-700 mb-2 text-left">
-                  {blog.date}
-                </p>
+                <p className="text-xs text-gray-700 mb-2 text-left">{blog.date}</p>
                 <span className="inline-block text-left text-xs bg-orange-500 text-white font-semibold px-2 py-1 rounded-md mb-2 w-fit">
                   {blog.type}
                 </span>
@@ -141,10 +151,8 @@ const BlogsAdmin = () => {
                     Edit
                   </button>
                   <button
-                    onClick={() =>
-                      navigate(`/panels/admins/blogs/hapus_blogs/${blog.slug}`)
-                    }
-                    className="bg-white text-black text-sm font-semibold border border-black hover:bg-gray-200 shadow-[0_3px_0_0_gray] px-4 py-2 rounded-md"
+                    onClick={() => handleDelete(blog.slug)}
+                    className="text-red-600 border border-red-600 font-semibold text-sm px-4 py-2 hover:bg-red-600 hover:text-white transition shadow-[0_3px_0_0_gray] rounded-md"
                   >
                     Hapus
                   </button>
