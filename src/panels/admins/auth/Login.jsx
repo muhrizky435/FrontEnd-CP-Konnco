@@ -50,10 +50,13 @@ const AdminLogin = () => {
       localStorage.setItem(
         "adminToken",
         JSON.stringify({
+          id: result.data.id,
           token: result.data.token,
-          name: result.data.name,
+          name: result.data.name, 
         })
       );
+      console.log("ADMIN TOKEN SET:", JSON.parse(localStorage.getItem("adminToken")));
+
 
       navigate("/panels/admins/dashboard");
     } catch {

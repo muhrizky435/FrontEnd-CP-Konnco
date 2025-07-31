@@ -1,88 +1,82 @@
-import React, { useState, useEffect } from "react";
-import api from "../../../api/axios";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
-import { useNavigate } from "react-router-dom";
 import useBreadcrumb from "../../../components/Breadcrumb";
+import api from "../../../api/axios";
 
 const Add_Blog_Admin = () => {
-  const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    author: "",
-    date: "",
-    type: "TECH",
-    content: "",
-  });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
-
   const navigate = useNavigate();
-  const breadcrumb = useBreadcrumb("memuat...");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [type, setType] = useState("");
+  const [slugInput, setSlugInput] = useState("");
+  const [authorId, setAuthorId] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timeout);
+    const stored = localStorage.getItem("adminToken");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        console.log("Stored token:", stored);
+        if (parsed.id) setAuthorId(parsed.id);
+        if (parsed.name) setAuthorName(parsed.name);
+      } catch (err) {
+        console.error("Gagal parse adminToken", err);
+      }
+    }
   }, []);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
-  const handleImageUpload = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const previewURL = URL.createObjectURL(file);
+      setThumbnailPreview(previewURL);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("HANDLE SUBMIT DIPANGGIL ✅");
-
-    const imageFile = document.getElementById("fileInput").files[0];
-    if (!imageFile) {
-      alert("Mohon unggah gambar terlebih dahulu.");
-      return;
-    }
-
-    console.info(formData);
-    console.info(imageFile);
-
-    const form = new FormData();
-    form.append("title", formData.title);
-    form.append("slug", formData.slug);
-    form.append("type", formData.type);
-    form.append("date", formData.date);
-    form.append("content", formData.content);
-    form.append("photo", imageFile);
-    form.append("authorId", "2bdc5646-0bad-484a-981a-50ce5a1b9b8a");
-
-    console.info(form);
-
+    setLoading(true);
     try {
-      const res = await api.post("/admins/blogs", form);
-      console.log("Blog berhasil:", res.data);
-      setSuccess(true);
-      setTimeout(() => {
-        navigate("/panels/admins/blogs");
-      }, 1500);
-    } catch (err) {
-      if (err.response?.data) {
-        console.error("Gagal submit blog:", err.response.data);
-      } else {
-        console.error("Error tidak diketahui:", err.message);
+      const form = new FormData();
+      form.append("title", title);
+      form.append("content", content);
+      form.append("type", type);
+      form.append("slug", slugInput);
+      form.append("authorId", authorId);
+
+      const file = fileInputRef.current?.files[0];
+      if (file) {
+        form.append("photo", file);
       }
+
+      await api.post("/admins/blogs", form);
+      alert("Blog berhasil ditambahkan.");
+      navigate("/panels/admins/blogs");
+    } catch (err) {
+      console.error("Gagal menambahkan blog:", err);
+      console.log(err.response?.data);
+      alert("Gagal menambahkan blog.");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const breadcrumb = useBreadcrumb("Tambah Blog");
 
   if (loading) return <KonncoLoader />;
 
@@ -93,17 +87,13 @@ const Add_Blog_Admin = () => {
         setIsSidebarOpen={setIsSidebarOpen}
       />
       <div className="flex-1 flex flex-col md:ml-48">
-        <AdminNavbar
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        />
-        <main className="px-4 sm:px-6 md:px-16 py-8 w-full">
-          <div className="text-sm text-gray-400 mb-4 text-left">
-            {breadcrumb}
-          </div>
+        <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
+        <main className="px-4 sm:px-6 md:px-16 py-8">
+          <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
+          <h1 className="text-2xl font-bold mb-4">Tambah Blog</h1>
 
-          <h1 className="text-xl font-bold mb-4 text-left">Tambah Blog</h1>
           <button
-            className="group text-orange-500 font-bold text-md flex items-center gap-1 mt-2"
+            className="group text-orange-500 font-bold text-md flex items-center gap-1"
             onClick={() => window.history.back()}
           >
             <span className="group-hover:-translate-x-1 transition-transform">
@@ -112,82 +102,60 @@ const Add_Blog_Admin = () => {
             Kembali
           </button>
 
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-            encType="multipart/form-data"
-          >
-            {/* Thumbnail Upload */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Thumbnail */}
             <div>
-              <label className="block text-md font-semibold mb-2 text-left">
+              <h3 className="text-md font-semibold mt-1 mb-1 text-left">
                 Thumbnail Gambar
-              </label>
+              </h3>
               <div
                 className="w-full h-[300px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-orange-500"
-                onClick={() => document.getElementById("fileInput").click()}
+                onClick={handleUploadClick}
               >
-                {imagePreview ? (
+                {thumbnailPreview ? (
                   <img
-                    src={imagePreview}
+                    src={thumbnailPreview}
                     alt="Preview"
-                    className="object-cover w-full h-full rounded"
+                    className="w-full h-full object-cover rounded-md"
                   />
                 ) : (
-                  <button className="w-20 h-20 bg-white rounded-md item-center text-xl font-bold text-gray-600 hover:bg-gray-200 transition">
+                  <button
+                    type="button"
+                    className="w-20 h-20 bg-white rounded-md text-xl font-bold text-gray-600 hover:bg-gray-200 transition"
+                  >
                     +
                   </button>
                 )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
               </div>
-              <input
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-              />
             </div>
 
-            {/* Judul */}
             <div>
-              <label className="block text-sm font-semibold mb-1 text-left">
-                Judul
-              </label>
+              <label className="block mb-1 font-semibold">Judul</label>
               <input
                 type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border p-2 rounded"
                 required
               />
             </div>
 
-            {/* Slug */}
             <div>
-              <label className="block text-sm font-semibold mb-1 text-left">
-                Slug
-              </label>
-              <input
-                type="text"
-                name="slug"
-                value={formData.slug}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded"
-                required
-              />
-            </div>
-
-            {/* Tipe Blog */}
-            <div>
-              <label className="block text-sm font-semibold mb-1 text-left">
-                Tipe
-              </label>
+              <label className="block mb-1 font-semibold">Tipe</label>
               <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded"
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+                className="w-full border p-2 rounded"
+                required
               >
+                <option value="">--Pilih Type--</option>
                 <option value="TECH">TECH</option>
                 <option value="BUSINESS">BUSINESS</option>
                 <option value="NEWS">NEWS</option>
@@ -196,68 +164,49 @@ const Add_Blog_Admin = () => {
               </select>
             </div>
 
-            {/* Penulis & Tanggal */}
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-bold mb-1 text-left">
-                  Penulis
-                </label>
-                <input
-                  type="text"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-bold mb-1 text-left">
-                  Tanggal
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded"
-                />
-              </div>
-            </div>
-
-            {/* Konten */}
             <div>
-              <label className="block text-sm font-bold mb-1 text-left">
-                Konten
-              </label>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                rows={10}
-                className="w-full h-80 px-4 py-2 border border-gray-300 rounded"
-                placeholder="Tulis konten blog di sini..."
+              <label className="block mb-1 font-semibold">Slug</label>
+              <input
+                type="text"
+                value={slugInput}
+                onChange={(e) => setSlugInput(e.target.value)}
+                className="w-full border p-2 rounded"
                 required
-              ></textarea>
+              />
             </div>
 
-            {/* Tombol Submit */}
-            <div className="flex justify-end">
+            {/* Author */}
+            <div>
+              <label className="block mb-1 font-semibold">Penulis</label>
+              <input
+                type="text"
+                value={authorName}
+                className="w-full border p-2 rounded bg-gray-100 cursor-not-allowed"
+                disabled
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold">Content</label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="w-full p-2 rounded min-h-[250px] bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none shadow-inner"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end mt-4">
               <button
                 type="submit"
-                className="bg-orange-500 text-white font-semibold px-6 py-2 rounded hover:bg-orange-600 border border-black shadow-[0_4px_0_0_#b45309]"
+                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 shadow-[0_4px_0_0_#b45309] border border-black"
               >
-                Tambah
+                Tambah Blog
               </button>
             </div>
           </form>
         </main>
       </div>
-
-      {success && (
-        <div className="fixed top-8 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50 animate-bounce">
-          ✅ Blog berhasil ditambahkan!
-        </div>
-      )}
     </div>
   );
 };
