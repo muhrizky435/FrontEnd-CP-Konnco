@@ -25,7 +25,6 @@ const Add_Blog_Admin = () => {
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
-        console.log("Stored token:", stored);
         if (parsed.id) setAuthorId(parsed.id);
         if (parsed.name) setAuthorName(parsed.name);
       } catch (err) {

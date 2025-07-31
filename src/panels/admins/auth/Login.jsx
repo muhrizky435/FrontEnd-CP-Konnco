@@ -31,7 +31,7 @@ const AdminLogin = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/v1/auth/admins/login",
+        "http://localhost:3000/api/v1/admins/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

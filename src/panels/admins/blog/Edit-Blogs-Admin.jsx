@@ -8,7 +8,6 @@ import api from "../../../api/axios";
 
 const Edit_Blog_Admin = () => {
   const { slug } = useParams();
-  console.log("slug:", slug);
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -30,12 +29,6 @@ const Edit_Blog_Admin = () => {
       try {
         const res = await api.get(`/admins/blogs/${slug}`);
         const data = res.data?.data;
-        console.log("Full response:", data);
-        console.log("Type yang diterima:", data.type);
-        console.log("Author ID yang dikirim:", data.author?.id);
-        console.log("Photo filename from API:", data.photo);
-
-
 
         if (!data) throw new Error("Data blog tidak ditemukan.");
 
