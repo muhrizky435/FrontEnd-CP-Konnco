@@ -10,6 +10,7 @@ const Add_Blog_Admin = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -64,7 +65,7 @@ const Add_Blog_Admin = () => {
       }
 
       await api.post("/admins/blogs", form);
-      alert("Blog berhasil ditambahkan.");
+      setShowSuccessModal(true);
       navigate("/panels/admins/blogs");
     } catch (err) {
       console.error("Gagal menambahkan blog:", err);
@@ -204,6 +205,24 @@ const Add_Blog_Admin = () => {
               </button>
             </div>
           </form>
+
+          {/* Modal */}
+          {showSuccessModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                  <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Di Tambah</h2>
+                  <p className="text-sm text-gray-700 mb-6">
+                    Blog telah berhasil ditambahkan.
+                  </p>
+                  <button
+                    onClick={() => setShowSuccessModal(false)}
+                    className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            )}
         </main>
       </div>
     </div>

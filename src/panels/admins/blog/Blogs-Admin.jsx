@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-
-import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
 import { FaFilter } from "react-icons/fa";
 import api from "../../../api/axios";
 import useDebounce from "../../../components/hooks/useDebounce";
+import useBreadcrumb from "../../../components/Breadcrumb";
 
 const BlogsAdmin = () => {
   const [blogs, setBlogs] = useState([]);
@@ -16,11 +16,8 @@ const BlogsAdmin = () => {
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-
-
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
@@ -78,24 +75,6 @@ const BlogsAdmin = () => {
     if (page !== 1) params.set("page", page);
     setSearchParams(params, { replace: true });
   }, [search, page, setSearchParams]);
-
-
-  const generateBreadcrumb = () => {
-    const pathParts = location.pathname.split("/").filter(Boolean);
-    return pathParts.map((part, idx) => {
-      const isLast = idx === pathParts.length - 1;
-      const label = part.replaceAll("-", " ").replaceAll("_", " ");
-      return (
-        <span
-          key={idx}
-          className={isLast ? "text-orange-500" : "text-gray-400"}
-        >
-          {idx > 0 && " / "}
-          {label.charAt(0).toUpperCase() + label.slice(1)}
-        </span>
-      );
-    });
-  };
 
   const confirmDelete = (slug) => {
   setSelectedSlug(slug);
@@ -166,6 +145,8 @@ const BlogsAdmin = () => {
     );
   };
 
+  const breadcrumb = useBreadcrumb ("All Blogs");
+
   if (loading) return <KonncoLoader />;
 
   return (
@@ -175,7 +156,7 @@ const BlogsAdmin = () => {
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
           <div className="flex items-center justify-between mb-4">
-            <div className="text-sm">{generateBreadcrumb()}</div>
+            <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
           </div>
 
           <h1 className="text-xl font-bold mb-4 text-left">Blogs</h1>

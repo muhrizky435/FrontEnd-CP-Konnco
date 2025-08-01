@@ -21,6 +21,10 @@ import Add_Blogs from './panels/admins/blog/Add-Blogs-Admin';
 import Product_Admin from './panels/admins/product/Product-Admin';
 import Detail_Product_Admin from './panels/admins/product/Detail-Product-Admin';
 // import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
+import Careers_Admin from './panels/admins/careers/Careers-Admin';
+// import Add_Careers_Admin from './panels/admins/careers/Add-Careers-Admin';
+import Detail_Careers_Admin from './panels/admins/careers/Detail-Careers-Admin';
+// import Edit_Careers_Admin from './panels/admins/careers/Edit-Careers-Admin';
 
 // Guard component
 const AdminGuard = ({ children }) => {
@@ -54,6 +58,9 @@ function App() {
         <Route path="/panels/admins/dashboard" element={
           <AdminGuard><DashboardAdmin /></AdminGuard>
         } />
+
+
+        {/* Blogs Admin */}
         <Route path="/panels/admins/blogs" element={
           <AdminGuard><BlogsAdmin /></AdminGuard>
         } />
@@ -66,6 +73,9 @@ function App() {
         <Route path="/panels/admins/blogs/add_blogs" element={
           <AdminGuard><Add_Blogs /></AdminGuard>
         } />
+
+
+        {/* Products Admin */}
         <Route path="/panels/admins/product" element={
           <AdminGuard><Product_Admin /></AdminGuard>
         } />
@@ -75,6 +85,24 @@ function App() {
         {/* <Route path="/panels/admins/product/edit/:id" element={
           <AdminGuard><Edit_Product_Admin /></AdminGuard>
         } /> */}
+
+
+        {/* careers Admin */}
+        <Route path="/panels/admins/careers" element={
+          <AdminGuard><Careers_Admin /></AdminGuard>
+        } />
+        <Route path="/panels/admins/careers/detail_careers/:careerId" element={
+          <AdminGuard><Detail_Careers_Admin /></AdminGuard>
+        } />
+        
+        {/* <Route path="/panels/admins/careers/edit_careers/:id" element={
+          <AdminGuard><Edit_Careers_Admin /></AdminGuard>
+        } />
+        <Route path="/panels/admins/careers/add_careers" element={
+          <AdminGuard><Add_Careers_Admin /></AdminGuard>
+        } /> */}
+       
+
       </Routes>
     </Router>
   );

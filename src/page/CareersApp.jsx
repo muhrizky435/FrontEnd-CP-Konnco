@@ -88,7 +88,7 @@ const Careers = () => {
             >
               <div className="bg-orange-500 w-full md:w-1/4 aspect-square md:aspect-auto md:h-auto flex items-center justify-center p-4">
                 <img
-                  src="/img/Code.png" // Bisa kamu sesuaikan, atau nanti dynamic
+                  src="/img/Code.png"
                   alt="gambar"
                   className="w-16 h-16 md:w-24 md:h-24 object-contain"
                 />

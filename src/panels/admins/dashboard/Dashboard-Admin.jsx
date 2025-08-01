@@ -5,6 +5,7 @@ import KonncoLoader from "../../../components/KonncoLoader";
 import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import useBreadcrumb from "../../../components/Breadcrumb";
 
 const DashboardAdmin = () => {
   const [loading, setLoading] = useState(true);
@@ -29,7 +30,7 @@ const DashboardAdmin = () => {
 
         const result = await response.json();
         if (!response.ok) throw new Error(result.message);
-        console.log("DASHBOARD DATA", result);
+        // console.log("DASHBOARD DATA", result);
         setOverviewData(result.data);
       } catch (err) {
         console.error("Gagal mengambil data overview:", err.message);
@@ -41,7 +42,10 @@ const DashboardAdmin = () => {
     fetchOverviewData();
   }, []);
 
+  const breadcrumb = useBreadcrumb ("Overview");
+
   if (loading) return <KonncoLoader />;
+
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
@@ -54,6 +58,7 @@ const DashboardAdmin = () => {
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
         <main className="px-4 sm:px-6 md:px-4 py-6">
+          <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
           <h1 className="text-xl font-bold mb-6 text-left">Overview</h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
