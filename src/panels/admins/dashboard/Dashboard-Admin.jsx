@@ -105,7 +105,7 @@ const DashboardAdmin = () => {
                         {blog.author.name}
                       </td>
                       <td>
-                        <span className="bg-orange-500 text-white text-xs px-1 py-1 ms-20 rounded-md">
+                        <span className="bg-orange-500 text-white text-xs md:ms-12 ms-2 px-1 py-1 rounded-md">
                           {blog.type}
                         </span>
                       </td>
@@ -163,8 +163,8 @@ const DashboardAdmin = () => {
             <div className="bg-white border border-gray-400 rounded-lg p-4">
               <h3 className="text-sm font-semibold mb-3 text-left">Tim</h3>
               <ul className="text-sm space-y-1 text-justify">
-                <li>Hendra Gunawan</li>
-                <li>Rina Oktaviani</li>
+                <li>Tim 1</li>
+                <li>Tim 2</li>
               </ul>
             </div>
           </div>
@@ -185,15 +185,18 @@ const DashboardAdmin = () => {
                 {overviewData?.findApplicationData?.map((application) => (
                   <tr key={application.id} className="border-t text-left">
                     <td className="py-2">{application.applicantName}</td>
-                    <td className="px-16">
+                    <td className="px-16 py-2">
                       {application.career?.title || "Posisi tidak tersedia"}
                     </td>
                     <td>
                       <button
                         onClick={() =>
-                          navigate(`/panels/admins/apply/${application.id}`)
+                          navigate(
+                            `/panels/admins/careers/${application.career?.id}/applications/${application.id}`
+                          )
                         }
                         className="flex group text-sm text-orange-500 font-semibold hover:text-[#F77F4D] items-center gap-1"
+                        disabled={!application.career?.id || !application.id}
                       >
                         Lihat Detail
                         <span className="ml-1 group-hover:translate-x-1 transition-transform">

@@ -199,7 +199,7 @@ const Add_Blog_Admin = () => {
             <div className="flex justify-end mt-4">
               <button
                 type="submit"
-                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 shadow-[0_4px_0_0_#b45309] border border-black"
+                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 shadow-[0_4px_0_0_#b45309]"
               >
                 Tambah Blog
               </button>

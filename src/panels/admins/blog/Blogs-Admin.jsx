@@ -171,7 +171,7 @@ const BlogsAdmin = () => {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="flex-grow rounded-md border border-black px-2 py-1 focus:outline-none min-w-[180px]"
+              className="flex-grow rounded-md border border-gray-500 px-2 py-1 focus:outline-none min-w-[180px]"
             />
             <div
               onClick={fetchBlogs}
@@ -192,7 +192,7 @@ const BlogsAdmin = () => {
             {blogs.map((blog) => (
               <div
                 key={blog.slug}
-                className="bg-white border border-black rounded-xl px-6 py-4 shadow-[0_6px_0_0_gray]"
+                className="bg-white border border-gray-500 rounded-xl px-6 py-4 shadow-[0_6px_0_0_gray]"
               >
                 <p className="text-xs text-gray-700 mb-2 text-left">{blog.date}</p>
                 <span className="inline-block text-left text-xs bg-orange-500 text-white font-semibold px-2 py-1 rounded-md mb-2 w-fit">
@@ -205,13 +205,13 @@ const BlogsAdmin = () => {
                 <div className="flex gap-2 justify-start pt-2 flex-wrap">
                   <button
                     onClick={() => navigate(`/panels/admins/blogs/detail_blogs/${blog.slug}`)}
-                    className="bg-orange-500 text-white text-sm font-semibold border border-black hover:bg-orange-600 shadow-[0_3px_0_0_#b45309] px-4 py-2 rounded-md"
+                    className="bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 shadow-[0_3px_0_0_#b45309] px-4 py-2 rounded-md"
                   >
                     Lihat
                   </button>
                   <button
                     onClick={() => navigate(`/panels/admins/blogs/edit_blogs/${blog.slug}`)}
-                    className="bg-white text-black text-sm font-semibold hover:bg-gray-200 border border-black shadow-[0_3px_0_0_gray] px-4 py-2 rounded-md"
+                    className="bg-white text-black text-sm font-semibold hover:bg-gray-200 border border-gray-500 shadow-[0_3px_0_0_gray] px-4 py-2 rounded-md"
                   >
                     Edit
                   </button>
@@ -228,6 +228,7 @@ const BlogsAdmin = () => {
 
           {/* Pagination */}
           {renderPagination()}
+          
           {/* Modal Delete */}
           {showModal && (
               <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

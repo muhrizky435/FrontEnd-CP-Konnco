@@ -10,6 +10,9 @@ const Careers_Admin = () => {
   const [loading, setLoading] = useState(true);
   const [careers, setCareers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
 
   const generateBreadcrumb = () => {
@@ -52,18 +55,27 @@ const Careers_Admin = () => {
     navigate(`/panels/admins/careers/detail_careers/${id}`);
   };
 
+  const handleDeleteClick = (id) => {
+    // console.log("klik hapus, id:", id);
+    setDeleteId(id);
+    setShowModal(true);
+  };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("Yakin ingin menghapus career ini?")) {
-      try {
-        await api.delete(`/admins/careers/${id}`);
-        setCareers((prev) => prev.filter((career) => career.id !== id));
-      } catch (error) {
-        console.error("Gagal menghapus:", error);
-        alert("Terjadi kesalahan saat menghapus.");
-      }
+  const handleDeleteConfirmed = async (id) => {
+    // console.log("id yang akan dihapus: ", deleteId);
+    try {
+      await api.delete(`/admins/careers/${id}`);
+      setCareers((prev) => prev.filter((career) => career.id !== id));
+      setShowModal(false);
+      setShowSuccessModal(true);
+      setDeleteId(null);
+    } catch (error) {
+      console.error("Gagal menghapus career:", error);
+      setShowModal(false);
+      setDeleteId(null);
     }
   };
+
 
   if (loading) return <KonncoLoader />;
 
@@ -86,7 +98,7 @@ const Careers_Admin = () => {
           {/* Tombol Tambah */}
           <div className="w-full flex justify-end mb-6">
             <button
-              onClick={() => navigate("/panels/admins/blogs/add_careers")}
+              onClick={() => navigate("/panels/admins/careers/add_careers")}
               className="text-white bg-orange-500 hover:bg-orange-400 text-sm font-semibold rounded-md shadow-[0_4px_0_0_#b45309] px-4 py-2"
             >
               + Tambah Karir
@@ -98,7 +110,7 @@ const Careers_Admin = () => {
             {careers.map((career) => (
               <div
                 key={career.id}
-                className="flex bg-white rounded-2xl shadow overflow-hidden border border-black"
+                className="flex bg-white rounded-2xl shadow overflow-hidden border border-gray-400"
               >
                 {/* Image dari Public */}
                 <CareerTypeIcon type={career.type} />
@@ -123,7 +135,7 @@ const Careers_Admin = () => {
                     ).map((tag, i) => (
                       <span
                         key={i}
-                        className="bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-md"
+                        className="bg-orange-500 text-white text-xs font-medium px-3 py-1 rounded-md shadow-[0_3px_0_0_#b45309]"
                       >
                         {tag}
                       </span>
@@ -134,19 +146,19 @@ const Careers_Admin = () => {
                   <div className="flex gap-3 flex-wrap">
                     <button
                       onClick={() => handleView(career.id)}
-                      className="px-4 py-1 border border-black text-black text-sm rounded-md font-medium hover:bg-black hover:text-white transition"
+                      className="bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 shadow-[0_3px_0_0_#b45309] px-4 py-2 rounded-md"
                     >
                       Lihat
                     </button>
                     <button
                       onClick={() => handleEdit(career.id)}
-                      className="px-4 py-1 border border-black text-black text-sm rounded-md font-medium hover:bg-black hover:text-white transition"
+                      className="bg-white text-gray-700 text-sm font-semibold hover:bg-gray-200 border border-gray-400 shadow-[0_3px_0_0_gray] px-4 py-2 rounded-md"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(career.id)}
-                      className="px-4 py-1 border border-black text-black text-sm rounded-md font-medium hover:bg-red-600 hover:text-white transition"
+                      onClick={() => handleDeleteClick(career.id)}
+                      className="text-red-600 border border-red-600 font-semibold text-sm px-4 py-2 hover:bg-red-600 hover:text-white transition shadow-[0_3px_0_0_#800000] rounded-md"
                     >
                       Hapus
                     </button>
@@ -155,6 +167,48 @@ const Careers_Admin = () => {
               </div>
             ))}
           </div>
+
+          {/* Modal Delete */}
+            {showModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6">
+                  <h2 className="text-lg font-semibold mb-4 text-center">Konfirmasi Hapus</h2>
+                  <p className="text-center text-sm text-gray-700 mb-6">
+                    Apakah kamu yakin ingin menghapus career ini?
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => { setShowModal(false); setDeleteId(null); }}
+                      className="px-4 py-2 text-sm border rounded-md hover:bg-gray-100 border-black shadow-[0_3px_0_0_gray]"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => handleDeleteConfirmed(deleteId)}
+                      className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 border border-red-600 shadow-[0_3px_0_0_#800000]"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {showSuccessModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                  <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Dihapus!</h2>
+                  <p className="text-sm text-gray-700 mb-6">
+                    Career telah berhasil dihapus.
+                  </p>
+                  <button
+                    onClick={() => setShowSuccessModal(false)}
+                    className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            )}
         </main>
       </div>
     </div>

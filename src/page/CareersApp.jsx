@@ -84,7 +84,7 @@ const Careers = () => {
               whileInView="visible"
               viewport={{ once: true, amount: 0.2 }}
               variants={fadeUp}
-              className="bg-white border rounded-2xl overflow-hidden md:flex text-justify border-black shadow-[0_4px_0_0_gray]"
+              className="bg-white border rounded-2xl overflow-hidden md:flex text-justify border-gray-400 shadow-[0_4px_0_0_gray]"
             >
               <div className="bg-orange-500 w-full md:w-1/4 aspect-square md:aspect-auto md:h-auto flex items-center justify-center p-4">
                 <img
@@ -124,7 +124,7 @@ const Careers = () => {
                     onClick={() =>
                       (window.location.href = `/detail_careers/${career.id}`)
                     }
-                    className="bg-white font-bold flex items-center gap-1 mt-2 group w-fit text-black rounded-lg px-6 py-2 hover:bg-gray-300 border border-black shadow-[0_4px_0_0_gray] transition-colors"
+                    className="bg-white font-bold flex items-center gap-1 mt-2 group w-fit text-black rounded-lg px-6 py-2 hover:bg-gray-300 border border-gray-400 shadow-[0_4px_0_0_gray] transition-colors"
                   >
                     Lihat Detail
                     <span className="ml-1 group-hover:translate-x-1 transition-transform">

@@ -30,6 +30,7 @@ const Step3 = ({ formData, setFormData, onBack, careerId }) => {
       payload.append("applicantName", formData.applicantName);
       payload.append("email", formData.email);
       payload.append("phoneNumber", formData.phoneNumber);
+      payload.append("position", formData.position);
       payload.append("educationLevel", formData.educationLevel);
       payload.append("instituteName", formData.instituteName);
       payload.append("message", message);
@@ -41,8 +42,8 @@ const Step3 = ({ formData, setFormData, onBack, careerId }) => {
 
       if (formData.position?.trim()) {
         payload.append("industry[position]", formData.position.trim());
-      } else if (formData.positionApply?.trim()) {
-        payload.append("industry[position]", formData.positionApply.trim());
+      } else if (formData.position2?.trim()) {
+        payload.append("industry[position]", formData.position.trim());
       }
 
       if (formData.lengthOfService?.trim()) {

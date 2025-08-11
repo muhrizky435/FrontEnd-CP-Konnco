@@ -133,7 +133,7 @@ const Detail_Blog = () => {
                 href={platform.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-white bg-orange-500 hover:bg-orange-600 text-sm font-semibold py-2 px-4 rounded-md border border-black shadow-[0_4px_0_0_#b45309] transition"
+                className="text-white bg-orange-500 hover:bg-orange-600 text-sm font-semibold py-2 px-4 rounded-md shadow-[0_4px_0_0_#b45309] transition"
               >
                 {platform.name}
               </a>

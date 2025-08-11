@@ -66,9 +66,9 @@ const Step1 = ({ formData, setFormData, onNext }) => {
         <h3 className="text-lg font-semibold text-left mb-2 mt-4">Posisi</h3>
         <label className="block mb-1 text-sm text-left">Posisi yang dilamar</label>
         <select
-          name="positionApply"
+          name="position"
           className="w-full border border-gray-300 px-3 py-2 rounded"
-          value={formData.positionApply || ""}
+          value={formData.position || ""}
           onChange={handleChange}
           required
         >

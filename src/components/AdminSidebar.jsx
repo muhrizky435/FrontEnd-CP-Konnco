@@ -177,7 +177,7 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               </li>
               <li>
                 <NavLink
-                  to="/panels/admins/careers/applicants"
+                  to="/panels/admins/careers/applications"
                   onClick={closeSidebar}
                   className={({ isActive }) =>
                     `block px-2 py-1 rounded-md text-left font-medium ${

@@ -15,6 +15,10 @@ const skillList = [
   "MySQL",
   "Laravel",
   "Figma",
+  "Adobe XD",
+  "Flutter",
+  "Android",
+  "iOS",
 ];
 
 const Step2 = ({ formData, setFormData, onNext, onBack }) => {
@@ -110,10 +114,10 @@ const Step2 = ({ formData, setFormData, onNext, onBack }) => {
             <div className="text-gray-400 text-sm">(opsional)</div>
           </div>
           <input
-            name="position"
+            name="position2"
             type="text"
             className="w-full border border-gray-300 px-3 py-2 rounded mb-2"
-            value={formData.position || ""}
+            value={formData.position2 || ""}
             onChange={(e) =>
               setFormData({ ...formData, position: e.target.value })
             }

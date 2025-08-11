@@ -40,7 +40,7 @@ const AdminLogin = () => {
       );
 
       const result = await response.json();
-      console.log("Login result:", result);
+      // console.log("Login result:", result);
 
       if (!response.ok) {
         setError(result.message || "Login gagal");
@@ -55,7 +55,7 @@ const AdminLogin = () => {
           name: result.data.name, 
         })
       );
-      console.log("ADMIN TOKEN SET:", JSON.parse(localStorage.getItem("adminToken")));
+      // console.log("ADMIN TOKEN SET:", JSON.parse(localStorage.getItem("adminToken")));
 
 
       navigate("/panels/admins/dashboard");
