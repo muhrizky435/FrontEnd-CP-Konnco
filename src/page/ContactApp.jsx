@@ -63,7 +63,7 @@ function ContactApp() {
   }, []);
 
   // Form state
-  const [form, setForm] = useState({ nama: "", email: "", pesan: "" });
+  const [form, setForm] = useState({ senderName: "", email: "", subject: "", message: "" });
   const [sending, setSending] = useState(false);
 
   const handleChange = (e) => {
@@ -76,15 +76,15 @@ function ContactApp() {
 
     try {
       const response = await api.post("/inquiries", {
-        senderName: form.nama,
+        senderName: form.senderName,
         email: form.email,
-        subject: "Contact Form", 
-        message: form.pesan,
+        subject: form.subject, 
+        message: form.message,
       });
 
       console.log("Respon API:", response.data);
       alert("Pesan berhasil dikirim!");
-      setForm({ nama: "", email: "", pesan: "" });
+      setForm({ senderName: "", email: "", subject: "", pesan: "" });
       navigate(`/thanks?type=contact&inquiryId=${response.data.data.id}`);
     } catch (err) {
       console.error("Gagal kirim pesan:", err);
@@ -172,16 +172,16 @@ function ContactApp() {
               <div className="flex flex-col md:flex-row md:space-x-4">
                 <div className="flex-1">
                   <label
-                    htmlFor="nama"
+                    htmlFor="senderName"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
                     Nama Lengkap
                   </label>
                   <input
                     type="text"
-                    name="nama"
-                    id="nama"
-                    value={form.nama}
+                    name="senderName"
+                    id="senderName"
+                    value={form.senderName}
                     onChange={handleChange}
                     required
                     className="block w-full px-4 py-3 text-gray-700 bg-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-[#18253A] focus:outline-none"
@@ -206,18 +206,36 @@ function ContactApp() {
                     placeholder="Masukkan alamat email Anda"
                   />
                 </div>
+                <div className="flex-1 mt-4 md:mt-0">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Judul Pesan
+                  </label>
+                  <input
+                    type="text"
+                    name="subject"
+                    id="subject"
+                    value={form.subject}
+                    onChange={handleChange}
+                    required
+                    className="block w-full px-4 py-3 text-gray-700 bg-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-[#18253A] focus:outline-none"
+                    placeholder="Masukkan alamat judul pesan anda"
+                  />
+                </div>
               </div>
               <div>
                 <label
-                  htmlFor="pesan"
+                  htmlFor="message"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
                   Pesan
                 </label>
                 <textarea
-                  name="pesan"
-                  id="pesan"
-                  value={form.pesan}
+                  name="message"
+                  id="message"
+                  value={form.message}
                   onChange={handleChange}
                   required
                   className="block w-full px-4 py-3 text-gray-700 bg-gray-100 rounded-md shadow-sm focus:ring-2 focus:ring-[#18253A] focus:outline-none resize-none"

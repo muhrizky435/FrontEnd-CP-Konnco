@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import axios from "../../../api/axios";
+import React, { useEffect, useState, useCallback } from "react";
+import api from "../../../api/axios";
 import { FiFilter } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { DateRange } from "react-date-range";
@@ -12,7 +12,7 @@ import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
 
 const Inquiries = () => {
-  const [Inquiries, setInquiries] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -22,6 +22,7 @@ const Inquiries = () => {
   const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
@@ -36,43 +37,42 @@ const Inquiries = () => {
     },
   ]);
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (page !== 1) params.set("page", page);
-    setSearchParams(params, { replace: true });
-  }, [search, page, setSearchParams]);
-
-  useEffect(() => {
-    const fetchInquiries = async () => {
-      try {
-        setLoading(true);
-        const params = {
-          search,
-          from: dateRange.from,
-          to: dateRange.to,
-          page,
-          limit,
-        };
-        const res = await axios.get("/admins/inquiries", { params });
-        setInquiries(res.data?.data || []);
-        setTotal(res.data?.total || 0);
-      } catch (err) {
-        console.error("Error fetching Inquiries:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInquiries();
-  }, [search, page, dateRange]);
-
+  // Update dateRange ketika date picker berubah
   useEffect(() => {
     setDateRange({
       from: format(range[0].startDate, "yyyy-MM-dd"),
       to: format(range[0].endDate, "yyyy-MM-dd"),
     });
   }, [range]);
+
+  // Fetch data dari backend
+  const fetchInquiries = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = {
+        search,
+        from: dateRange.from,
+        to: dateRange.to,
+        page,
+        limit,
+      };
+      const res = await api.get("/admins/inquiries", { params });
+      setInquiries(res.data?.data || []);
+      setTotal(res.data?.pagination?.totalData || 0);
+    } catch (err) {
+      console.error("Error fetching Inquiries:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, dateRange, page, limit]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (page !== 1) params.set("page", page);
+    setSearchParams(params, { replace: true });
+    fetchInquiries();
+  }, [search, page, dateRange, fetchInquiries, setSearchParams]);
 
   const totalPages = Math.ceil(total / limit);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -89,19 +89,24 @@ const Inquiries = () => {
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-6 md:px-4 py-6">
           <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
-          <h1 className="text-xl font-bold mb-6 text-left">Pertanyaan</h1>
+          <h1 className="text-xl font-bold mb-6 text-left">Pesan Masuk</h1>
+
+          {/* Card total pesan */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow border">
+              <p className="text-sm text-gray-500">Total Pesan Masuk</p>
+              <p className="text-2xl font-bold text-orange-500">{total}</p>
+            </div>
+          </div>
 
           {/* Filter */}
-          <div className="flex flex-wrap gap-2 mb-4 w-full">
+          <div className="flex flex-wrap gap-4 mb-4 w-full">
             <input
               type="text"
-              placeholder="Cari Pertanyaan..."
+              placeholder="Cari Pesan Masuk"
               className="w-full max-w-sm border border-gray-300 rounded-md px-4 py-2 text-sm"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
 
             <div className="relative">
@@ -127,8 +132,13 @@ const Inquiries = () => {
               )}
             </div>
 
+            {/* Tombol filter */}
             <div
-              className="w-10 h-10 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              className="w-10 h-9 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                setSearch(searchInput);
+                setPage(1);
+              }}
             >
               <FiFilter className="text-white" />
             </div>
@@ -136,37 +146,38 @@ const Inquiries = () => {
 
           {/* Table */}
           <div className="overflow-x-auto border rounded-lg">
-            <table className="table w-full text-sm text-center">
+            <table className="table w-full text-sm text-justify">
               <thead className="bg-gray-100 text-gray-700">
                 <tr className="border-b">
-                  <th className="py-3">Pelamar</th>
-                  <th className="py-3">Posisi</th>
-                  <th className="py-3">Aksi</th>
+                  <th className="py-3 px-2">Nama Pengirim</th>
+                  <th className="py-3 px-2">Email</th>
+                  <th className="py-3 px-2">Judul</th>
+                  <th className="py-3 px-2">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                {Inquiries.map((app) => (
+                {inquiries.map((app) => (
                   <tr key={app.id} className="border-b hover:bg-gray-50">
-                    <td className="py-2">{app.applicantName}</td>
-                    <td className="py-2">{app.position}</td>
-                    <td className="py-2">
+                    <td className="py-2 px-2">{app.senderName}</td>
+                    <td className="py-2 px-2">{app.email}</td>
+                    <td className="py-2 px-2">{app.subject}</td>
+                    <td className="py-2 px-2">
                       <button
-                        className="text-orange-500 hover:underline"
-                        onClick={() =>
-                          navigate(
-                            `/admin/careers/${app.careerId}/Inquiries/${app.id}`
-                          )
-                        }
+                        className="flex group text-sm text-orange-500 font-semibold hover:text-[#F77F4D] items-center gap-1"
+                        onClick={() => navigate(`/panels/admins/Inquiries/detail_inquiries/${app.id}`)}
                       >
-                        Lihat Detail &rarr;
+                        Lihat Detail
+                        <span className="ml-1 group-hover:translate-x-1 transition-transform">
+                          &rarr;
+                        </span>
                       </button>
                     </td>
                   </tr>
                 ))}
-                {Inquiries.length === 0 && (
+                {inquiries.length === 0 && (
                   <tr>
-                    <td colSpan="3" className="text-center text-gray-400 py-4">
-                      Tidak ada data pelamar.
+                    <td colSpan="4" className="text-center text-gray-400 py-4">
+                      Tidak ada Pesan Masuk.
                     </td>
                   </tr>
                 )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FiDownload } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
+import api from "../../../api/axios";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
 import AdminSidebar from "../../../components/AdminSidebar";
@@ -15,30 +15,29 @@ const DetailInquiries = () => {
   const breadcrumb = useBreadcrumb("Inquiries", "Detail Inquiries");
 
   useEffect(() => {
-    const fetchInquiry = async () => {
-      try {
-        const res = await fetch(`/admins/inquiries/${inquiryId}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Gagal mengambil data inquiry");
-        const data = await res.json();
-        setInquiry(data);
-      } catch (err) {
-        console.error(err);
-        setInquiry(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const fetchDetailInquiry = async () => {
+        try {
+          setLoading(true);
+          const res = await api.get(
+            `/admins/inquiries/${inquiryId}`
+          );
+          setInquiry(res.data?.data || null);
+        } catch (err) {
+          console.error(err);
+          setInquiry(null);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDetailInquiry();
+    }, [inquiryId]);
 
-    fetchInquiry();
-  }, [inquiryId]);
 
   if (loading) return <KonncoLoader />;
   if (!inquiry)
     return (
       <div className="p-6 text-center text-red-500">
-        Data inquiry tidak ditemukan.
+        Pesan Masuk tidak ditemukan.
       </div>
     );
 
@@ -69,54 +68,25 @@ const DetailInquiries = () => {
             Kembali
           </button>
 
-          <h2 className="text-xl font-bold mb-2">Karir</h2>
-
-          <div className="space-y-2 mb-6">
-            <p>
-              <span className="font-semibold">Dari:</span> {inquiry.name}
-            </p>
-            <p>
-              {inquiry.email} | {inquiry.phone}
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="font-semibold mb-1">Curriculum Vitae</h2>
-            <a
-              href={inquiry.cvFileUrl}
-              download
-              className="flex items-center gap-2 text-orange-600 hover:underline"
-            >
-              <FiDownload />
-              <span>{inquiry.cvFileName}</span>
-            </a>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="font-semibold mb-1">Pesan</h2>
-            <div className="whitespace-pre-line text-justify leading-relaxed">
-              {inquiry.letter}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t pt-6">
+          <div className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-1">Posisi yang dilamar</h3>
-              <p>{inquiry.position}</p>
+              <h3 className="font-semibold">Dari</h3>
+              <p>{inquiry.senderName}</p>
             </div>
+
             <div>
-              <h3 className="font-semibold mb-1">Pendidikan Terakhir</h3>
-              <p>Jenjang: {inquiry.education.degree}</p>
-              <p>Nama Institusi: {inquiry.education.institution}</p>
+              <h3 className="font-semibold">Email</h3>
+              <p>{inquiry.email}</p>
             </div>
+
             <div>
-              <h3 className="font-semibold mb-1">Pengalaman Kerja</h3>
-              <p>Nama Perusahaan: {inquiry.experience.company}</p>
-              <p>Lama Bekerja: {inquiry.experience.duration}</p>
+              <h3 className="font-semibold">Subjek</h3>
+              <p>{inquiry.subject}</p>
             </div>
+
             <div>
-              <h3 className="font-semibold mb-1">Skill</h3>
-              <p>{inquiry.skills}</p>
+              <h3 className="font-semibold">Pesan</h3>
+              <p className="whitespace-pre-line">{inquiry.message}</p>
             </div>
           </div>
         </main>

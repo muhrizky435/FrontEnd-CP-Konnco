@@ -15,7 +15,7 @@ import { BsBriefcase } from "react-icons/bs";
 const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const [openMenus, setOpenMenus] = useState({
     blogs: false,
-    product: false,
+    product: false, 
     career: false,
   });
 
@@ -192,6 +192,24 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
               </li>
             </ul>
           )}
+        </li>
+
+        {/* Pesan Masuk / inquiries */}
+        <li>
+          <NavLink
+            to="/panels/admins/inquiries"
+            onClick={closeSidebar}
+            className={({ isActive }) =>
+              `flex items-center gap-2 px-3 py-2 font-semibold rounded-md border transition-all ${
+                isActive
+                  ? "bg-white border-gray-500"
+                  : "text-black border-transparent hover:bg-orange-100"
+              }`
+            }
+          >
+            <div className="text-orange-500" />
+            Pesan Masuk
+          </NavLink>
         </li>
       </ul>
     </div>

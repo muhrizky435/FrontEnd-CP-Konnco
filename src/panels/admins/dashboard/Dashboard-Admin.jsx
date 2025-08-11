@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
+import api from "../../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaEdit } from "react-icons/fa";
 import { RiDeleteBin5Line } from "react-icons/ri";
@@ -11,41 +12,60 @@ const DashboardAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [overviewData, setOverviewData] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedSlug, setSelectedSlug] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
+  const fetchOverviewData = async () => {
+    try {
+      const adminData = JSON.parse(localStorage.getItem("adminToken"));
+      const token = adminData?.token;
+
+      const response = await fetch(
+        "http://localhost:3000/api/v1/admins/dashboard/overview",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      setOverviewData(result.data);
+    } catch (err) {
+      console.error("Gagal mengambil data overview:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOverviewData = async () => {
-      try {
-        const adminData = JSON.parse(localStorage.getItem("adminToken"));
-        const token = adminData?.token;
-
-        const response = await fetch(
-          "http://localhost:3000/api/v1/admins/dashboard/overview",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
-        // console.log("DASHBOARD DATA", result);
-        setOverviewData(result.data);
-      } catch (err) {
-        console.error("Gagal mengambil data overview:", err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOverviewData();
   }, []);
 
-  const breadcrumb = useBreadcrumb ("Overview");
+  const confirmDelete = (slug) => {
+    setSelectedSlug(slug);
+    setShowModal(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    try {
+      await api.delete(`/admins/blogs/${selectedSlug}`);
+      setShowModal(false);
+      setSelectedSlug(null);
+      await fetchOverviewData();
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Gagal menghapus blog:", error);
+      alert("Gagal menghapus blog.");
+    }
+  };
+
+  const breadcrumb = useBreadcrumb("Overview");
 
   if (loading) return <KonncoLoader />;
-
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
@@ -132,11 +152,7 @@ const DashboardAdmin = () => {
                             <FaEdit />
                           </button>
                           <button
-                            onClick={() =>
-                              navigate(
-                                `/panels/admins/blogs/delete_blogs/${blog.slug}`
-                              )
-                            }
+                            onClick={() => confirmDelete(blog.slug)}
                             className="bg-red-500 text-white text-xs hover:bg-red-800 px-2 py-2 rounded-md"
                           >
                             <RiDeleteBin5Line />
@@ -192,11 +208,10 @@ const DashboardAdmin = () => {
                       <button
                         onClick={() =>
                           navigate(
-                            `/panels/admins/careers/${application.career?.id}/applications/${application.id}`
+                            `/panels/admins/careers/${application.careerId}/applications/${application.id}`
                           )
                         }
                         className="flex group text-sm text-orange-500 font-semibold hover:text-[#F77F4D] items-center gap-1"
-                        disabled={!application.career?.id || !application.id}
                       >
                         Lihat Detail
                         <span className="ml-1 group-hover:translate-x-1 transition-transform">
@@ -210,7 +225,7 @@ const DashboardAdmin = () => {
             </table>
             <div className="flex justify-left mt-4 mb-2">
               <button
-                onClick={() => navigate("/panels/admins/apply")}
+                onClick={() => navigate("/panels/admins/careers/applications")}
                 className="font-semibold flex gap-1 group w-fit text-orange-500 hover:text-[#F77F4D] transition-colors"
               >
                 Lihat Selanjutnya
@@ -220,6 +235,47 @@ const DashboardAdmin = () => {
               </button>
             </div>
           </div>
+          {/* Modal Delete */}
+          {showModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6">
+                  <h2 className="text-lg font-semibold mb-4 text-center">Konfirmasi Hapus</h2>
+                  <p className="text-center text-sm text-gray-700 mb-6">
+                    Apakah kamu yakin ingin menghapus blog ini?
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => setShowModal(false)}
+                      className="px-4 py-2 text-sm border rounded-md hover:bg-gray-100 border-black shadow-[0_3px_0_0_gray] "
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={handleDeleteConfirmed}
+                      className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 border border-red-600 shadow-[0_3px_0_0_#800000] "
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {showSuccessModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                  <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Dihapus!</h2>
+                  <p className="text-sm text-gray-700 mb-6">
+                    Blog telah berhasil dihapus.
+                  </p>
+                  <button
+                    onClick={() => setShowSuccessModal(false)}
+                    className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            )}
         </main>
       </div>
     </div>
