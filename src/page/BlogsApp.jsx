@@ -52,7 +52,7 @@ function BlogsApp() {
             : "Tanggal tidak tersedia",
           type: blogs.type,
           image_url: blogs.photo
-            ? `http://localhost:3000${blogs.photo}`
+            ? `http://localhost:3000/blogs/${blogs.photo}`
             : "/img/default-image.png",
           content: blogs.content
             ? blogs.content.slice(0, 120) + "..."
@@ -97,7 +97,7 @@ function BlogsApp() {
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-4 mt-2">
               Konnco Blogs
             </h1>
-            <p className="text-gray-700 text-base md:text-lg max-w-2xl mx-auto text-center">
+            <p className="text-gray-700 text-base md:text-lg max-w-2xl mx-auto text-justify">
               Kami percaya bahwa berbagi wawasan adalah bagian penting dari
               pengembangan teknologi yang berkelanjutan. Melalui blog ini, kami
               membagikan berbagai artikel. studi kasus, dan tips seputar
@@ -119,7 +119,7 @@ function BlogsApp() {
               >
                 {/* Image */}
                 <img
-                  src={blog.image_url || "/img/default-image.png"}
+                  src={blog.image_url }
                   alt={blog.title}
                   className="w-full h-48 object-cover"
                 />

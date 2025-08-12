@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import api from "../api/axios";
 import KonncoLoader from "../components/KonncoLoader";
 import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
@@ -15,7 +16,6 @@ import {
   logoLink,
 } from "../assets/img";
 
-void motion;
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
@@ -36,20 +36,35 @@ function DetailBlogs() {
   const drawerRef = useRef(null);
   const { slug } = useParams();
 
+  // Ambil data blog detail
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const res = await fetch(`http://localhost:3000/api/v1/blogs/${slug}`);
-        const json = await res.json();
-        setBlogs(json.data);
-      } catch (error) {
-        console.error("Gagal fetch blog:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlog();
+    setLoading(true);
+    api
+      .get(`/blogs/${slug}`)
+      .then((res) => {
+        const blog = res.data?.data;
+        if (!blog) {
+          setBlogs(null);
+          return;
+        }
+        setBlogs({
+          id: blog.id,
+          title: blog.title || "Judul tidak tersedia",
+          author: blog.author?.name || "Tidak diketahui",
+          createdAt: blog.createdAt || null,
+          type: blog.type || "-",
+          image_url: blog.photo
+            ? `http://localhost:3000/blogs/${blog.photo}`
+            : "/img/default-image.png",
+          content: blog.content || "Tidak ada konten.",
+          slug: blog.slug,
+        });
+      })
+      .catch((err) => {
+        console.error("Gagal ambil blog:", err.response?.data || err.message);
+        setBlogs(null);
+      })
+      .finally(() => setLoading(false));
   }, [slug]);
 
   const { ref: footerRef, inView: footerInView } = useInView({ threshold: 0 });
@@ -58,6 +73,7 @@ function DetailBlogs() {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-white font-sans">
+      {/* Navbar */}
       <KonncoNavbar
         fadeUp={fadeUp}
         fadeLeft={fadeLeft}
@@ -68,7 +84,9 @@ function DetailBlogs() {
         drawerRef={drawerRef}
       />
 
+      {/* Konten */}
       <main className="flex-1 w-full px-4 md:px-32 pt-4 pb-16 text-justify">
+        {/* Tombol Kembali */}
         <button
           className="group font-semibold text-orange-500 text-lg mb-4 flex items-center gap-1"
           onClick={() => window.history.back()}
@@ -79,19 +97,17 @@ function DetailBlogs() {
           Kembali
         </button>
 
+        {/* Gambar */}
         <motion.img
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          src={
-            blogs.photo
-              ? `http://localhost:3000/api/v1/blogs/${blogs.photo}`
-              : "/img/default-image.png"
-          }
+          src={blogs.image_url}
           alt={blogs.title}
           className="w-full h-[300px] object-cover mb-6 rounded"
         />
 
+        {/* Info Penulis & Tanggal */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -105,19 +121,22 @@ function DetailBlogs() {
                 d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-3.33 0-10 1.67-10 5v3h20v-3c0-3.33-6.67-5-10-5Z"
               />
             </svg>
-            {blogs.author?.name}
+            {blogs.author}
           </span>
-          <span className="inline-flex items-center gap-1 ml-3 text-justify">
+          <span className="inline-flex items-center gap-1 ml-3">
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
               <path
                 fill="#E86A1C"
                 d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 16H5V10h14v10Zm0-12H5V6h14v2Z"
               />
             </svg>
-            {new Date(blogs.createdAt).toLocaleDateString("id-ID")}
+            {blogs.createdAt
+              ? new Date(blogs.createdAt).toLocaleDateString("id-ID")
+              : "Tanggal tidak tersedia"}
           </span>
         </motion.div>
 
+        {/* Tipe Blog */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -127,6 +146,7 @@ function DetailBlogs() {
           {blogs.type}
         </motion.div>
 
+        {/* Judul */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -136,6 +156,7 @@ function DetailBlogs() {
           {blogs.title}
         </motion.div>
 
+        {/* Konten */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -144,6 +165,7 @@ function DetailBlogs() {
           dangerouslySetInnerHTML={{ __html: blogs.content }}
         />
 
+        {/* Bagikan ke */}
         <motion.div
           initial="hidden"
           animate="visible"
@@ -175,6 +197,7 @@ function DetailBlogs() {
         </motion.div>
       </main>
 
+      {/* Footer */}
       <KonncoFooter
         fadeUp={fadeUp}
         fadeLeft={fadeLeft}
@@ -192,4 +215,5 @@ function DetailBlogs() {
   );
 }
 
+void motion;
 export default DetailBlogs;

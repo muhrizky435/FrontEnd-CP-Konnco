@@ -94,39 +94,38 @@ const KonncoNavbar = ({
       className="flex justify-between items-center w-full px-4 md:px-10 pt-2 pb-5 bg-white sticky top-0 z-30 border-b border-orange-200"
     >
       {/* LOGO */}
-      <div className="flex items-center" to="/">
-        <Link className="flex items-center gap-3 group">
-          <motion.img
-            src={logoKonnco}
-            alt="Konnco Studio Logo"
-            className="h-12 mr-2 transition-transform group-hover:scale-105"
-            variants={fadeLeft}
+      <Link to="/" className="flex items-center gap-3 group">
+        <motion.img
+          src={logoKonnco}
+          alt="Konnco Studio Logo"
+          className="h-12 mr-2 transition-transform group-hover:scale-105"
+          variants={fadeLeft}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.7 }}
+        />
+        <div className="flex flex-col">
+          <motion.div
+            className="font-bold text-2xl text-gray-900 tracking-wide leading-tight text-left"
+            variants={fadeUp}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.7 }}
-          />
-          <div className="flex flex-col">
-            <motion.div
-              className="font-bold text-2xl text-gray-900 tracking-wide leading-tight text-left"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.9 }}
-            >
-              Konnco Studio
-            </motion.div>
-            <motion.div
-              className="text-xs text-orange-600 tracking-widest font-medium mt-1 text-left"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.1 }}
-            >
-              Execute Better
-            </motion.div>
-          </div>
-        </Link>
-      </div>
+            transition={{ delay: 0.9 }}
+          >
+            Konnco Studio
+          </motion.div>
+          <motion.div
+            className="text-xs text-orange-600 tracking-widest font-medium mt-1 text-left"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.1 }}
+          >
+            Execute Better
+          </motion.div>
+        </div>
+      </Link>
+
       {/* Hamburger for Mobile */}
       <button
         className="md:hidden p-3 rounded-xl bg-white shadow hover:shadow-lg transition ml-auto"

@@ -15,6 +15,7 @@ import {
   logoFB,
   logoIG,
   logoTiktok,
+  logoEmail,
   logoLink,
 } from "../assets/img";
 
@@ -269,6 +270,7 @@ function ContactApp() {
         logoFB={logoFB}
         logoIG={logoIG}
         logoTiktok={logoTiktok}
+        logoEmail={logoEmail}
         logoLink={logoLink}
         footerRef={footerRef}
         footerInView={footerInView}

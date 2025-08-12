@@ -58,7 +58,7 @@ function App() {
         <Route path="/panels/admins/auth/login" element={<AuthAdmin />} />
         <Route path="/panels/admins/auth/forgot_password" element={<ForgotPassword />} />
 
-        {/* Protected Admin Panel Routes */}
+        {/* Protected Admin Panel Routes -- Dashboard */}
         <Route path="/panels/admins/dashboard" element={
           <AdminGuard><DashboardAdmin /></AdminGuard>
         } />
