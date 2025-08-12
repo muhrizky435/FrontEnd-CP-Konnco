@@ -10,6 +10,9 @@ const Edit_Blog_Admin = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [loading, setLoading] = useState(true);
 
@@ -24,11 +27,14 @@ const Edit_Blog_Admin = () => {
 
   const fileInputRef = useRef(null);
 
+  const breadcrumb = useBreadcrumb("Edit Blog");
+
   useEffect(() => {
     const fetchBlog = async () => {
       try {
         const res = await api.get(`/admins/blogs/${slug}`);
         const data = res.data?.data;
+        console.log("Data blog:", data);
 
         if (!data) throw new Error("Data blog tidak ditemukan.");
 
@@ -82,17 +88,22 @@ const Edit_Blog_Admin = () => {
       }
 
       await api.put(`/admins/blogs/${slug}`, form);
-      alert("Blog berhasil diperbarui.");
-      navigate("/panels/admins/blogs");
+      setShowSuccessModal(true);
+      
     } catch (err) {
       console.error("Gagal mengedit blog:", err);
       console.error("Full error response:", err.response?.data);
 
-      alert("Gagal memperbarui blog.");
+      if (typeof err.response?.data?.message === "string" && err.response.data.message.toLowerCase().includes("slug")) {
+        setErrorMessage("Slug sudah digunakan.");
+        setShowErrorModal(true);
+      } else if (typeof err.response?.data?.message === "string") {
+        setErrorMessage("Gagal memperbarui blog.");
+        setShowErrorModal(true);
+      }
     }
   };
 
-  const breadcrumb = useBreadcrumb(title || "Memuat...");
 
   if (loading) return <KonncoLoader />;
 
@@ -236,6 +247,41 @@ const Edit_Blog_Admin = () => {
               </button>
             </div>
           </form>
+
+          {/* Modal Error */}
+          {showErrorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-red-600">Gagal Mengedit</h2>
+                <p className="text-sm text-gray-700 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Sukses */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Diupdate</h2>
+                <p className="text-sm text-gray-700 mb-6">Blog telah berhasil diupdate.</p>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate("/panels/admins/blogs");
+                  }}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

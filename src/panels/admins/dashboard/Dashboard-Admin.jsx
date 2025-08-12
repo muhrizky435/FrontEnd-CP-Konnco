@@ -82,16 +82,16 @@ const DashboardAdmin = () => {
           <h1 className="text-xl font-bold mb-6 text-left">Overview</h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-orange-500 text-white rounded-lg p-4 shadow-[0_4px_0_0_#b45309]">
-              <p className="text-sm">Total Blog</p>
-              <p className="text-2xl font-bold">
+            <div className="bg-white border border-orange-400 rounded-lg p-4 shadow-[0_3px_0_0_#b45309]">
+              <p className="text-sm text-black">Total Blog</p>
+              <p className="text-2xl font-bold text-orange-500">
                 {overviewData?.countBlogData || 0}
                 <span className="text-sm font-medium">/Minggu</span>
               </p>
             </div>
-            <div className="bg-orange-500 text-white rounded-lg p-4 shadow-[0_4px_0_0_#b45309]">
+            <div className="bg-white border border-orange-400 rounded-lg p-4 shadow-[0_3px_0_0_#b45309]">
               <p className="text-sm">Total Apply Karir</p>
-              <p className="text-2xl font-bold">
+              <p className="text-2xl font-bold text-orange-500">
                 {overviewData?.countApplicationData || 0}
                 <span className="text-sm font-medium">/Bulan</span>
               </p>
@@ -99,7 +99,7 @@ const DashboardAdmin = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[5fr_2fr] gap-3">
-            <div className="bg-white border border-gray-400 rounded-lg p-4">
+            <div className="bg-white border border-gray-400 rounded-lg p-4 shadow-lg">
               <h2 className="font-bold text-lg mb-4 text-left">
                 Aktivitas Terkini
               </h2>
@@ -176,7 +176,7 @@ const DashboardAdmin = () => {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-400 rounded-lg p-4">
+            <div className="bg-white border border-gray-400 rounded-lg p-4 shadow-lg">
               <h3 className="text-sm font-semibold mb-3 text-left">Tim</h3>
               <ul className="text-sm space-y-1 text-justify">
                 <li>Tim 1</li>
@@ -185,7 +185,7 @@ const DashboardAdmin = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-400 rounded-lg p-4 mt-6 justify-left">
+          <div className="bg-white border border-gray-400 rounded-lg p-4 mt-6 justify-left shadow-lg">
             <h3 className="text-lg font-semibold mb-4 text-left">
               Lamaran Masuk
             </h3>

@@ -11,6 +11,8 @@ const Add_Blog_Admin = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -66,11 +68,17 @@ const Add_Blog_Admin = () => {
 
       await api.post("/admins/blogs", form);
       setShowSuccessModal(true);
-      navigate("/panels/admins/blogs");
+      
     } catch (err) {
       console.error("Gagal menambahkan blog:", err);
-      console.log(err.response?.data);
-      alert("Gagal menambahkan blog.");
+
+      if (typeof err.response?.data?.message === "string" && err.response.data.message.toLowerCase().includes("slug")) {
+        setErrorMessage("Slug sudah digunakan, silakan ganti slug lain");
+        setShowErrorModal(true);
+      } else if (typeof err.response?.data?.message === "string") {
+        setErrorMessage("Terjadi kesalahan, silakan coba lagi");
+        setShowErrorModal(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -206,23 +214,40 @@ const Add_Blog_Admin = () => {
             </div>
           </form>
 
-          {/* Modal */}
-          {showSuccessModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
-                  <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Di Tambah</h2>
-                  <p className="text-sm text-gray-700 mb-6">
-                    Blog telah berhasil ditambahkan.
-                  </p>
-                  <button
-                    onClick={() => setShowSuccessModal(false)}
-                    className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
-                  >
-                    Tutup
-                  </button>
-                </div>
+          {/* Modal Error */}
+          {showErrorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-red-600">Gagal Menambahkan</h2>
+                <p className="text-sm text-gray-700 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600"
+                >
+                  Tutup
+                </button>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Modal Sukses */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Ditambahkan</h2>
+                <p className="text-sm text-gray-700 mb-6">Blog telah berhasil ditambahkan.</p>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate("/panels/admins/blogs");
+                  }}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

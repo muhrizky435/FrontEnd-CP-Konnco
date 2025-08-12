@@ -3,9 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
-import { FaFilter } from "react-icons/fa";
+import { FiFilter } from "react-icons/fi";
 import api from "../../../api/axios";
-import useDebounce from "../../../components/hooks/useDebounce";
 import useBreadcrumb from "../../../components/Breadcrumb";
 
 const BlogsAdmin = () => {
@@ -15,22 +14,22 @@ const BlogsAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [total, setTotal] = useState(0);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const limit = 10;
   const navigate = useNavigate();
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const [totalPage, setTotalPage] = useState(1);
-  const debouncedSearch = useDebounce(search, 500);
 
-  const fetchBlogs = useCallback(() => {
-  setLoading(true);
-  api
-    .get("/admins/blogs", {
-      params: { page, search: debouncedSearch },
-    })
-    .then((res) => {
+  const breadcrumb = useBreadcrumb("All Blogs");
+
+  const fetchBlogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = { search, page, limit };
+      const res = await api.get("/admins/blogs", { params });
       const data = res.data?.data || [];
       const formatted = data.map((item) => ({
         id: item.slug,
@@ -55,30 +54,31 @@ const BlogsAdmin = () => {
         slug: item.slug,
       }));
       setBlogs(formatted);
-      if (res.data.totalCount) {
-        setTotalPage(Math.ceil(res.data.totalCount / 10));
+
+      if (res.data?.pagination?.totalData !== undefined) {
+        setTotal(res.data.pagination.totalData);
       }
-    })
-    .catch((err) => {
+    } catch (err) {
       console.error("Gagal ambil blog:", err.response?.data || err.message);
-    })
-    .finally(() => setLoading(false));
-  }, [page, debouncedSearch]);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, page]);
 
-    useEffect(() => {
-    fetchBlogs();
-  }, [fetchBlogs]);
-
-    useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
     if (page !== 1) params.set("page", page);
     setSearchParams(params, { replace: true });
-  }, [search, page, setSearchParams]);
+    fetchBlogs();
+  }, [search, page, setSearchParams, fetchBlogs]);
+
+  const totalPages = Math.ceil(total / limit);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const confirmDelete = (slug) => {
-  setSelectedSlug(slug);
-  setShowModal(true);
+    setSelectedSlug(slug);
+    setShowModal(true);
   };
 
   const handleDeleteConfirmed = async () => {
@@ -94,59 +94,6 @@ const BlogsAdmin = () => {
     }
   };
 
-  const renderPagination = () => {
-    const visiblePages = [];
-    const DOTS = "...";
-
-    if (totalPage <= 7) {
-      for (let i = 1; i <= totalPage; i++) visiblePages.push(i);
-    } else {
-      visiblePages.push(1);
-      if (page > 4) visiblePages.push(DOTS);
-      const start = Math.max(2, page - 1);
-      const end = Math.min(totalPage - 1, page + 1);
-      for (let i = start; i <= end; i++) visiblePages.push(i);
-      if (page < totalPage - 3) visiblePages.push(DOTS);
-      visiblePages.push(totalPage);
-    }
-
-    return (
-      <div className="flex justify-center items-end gap-2 mt-8 flex-wrap">
-        <button
-          onClick={() => page > 1 && setPage(page - 1)}
-          disabled={page === 1}
-          className="px-3 py-1 border rounded-md disabled:opacity-50"
-        >
-          &lt;
-        </button>
-        {visiblePages.map((item, index) =>
-          item === DOTS ? (
-            <span key={index} className="px-3 py-1">...</span>
-          ) : (
-            <button
-              key={index}
-              onClick={() => setPage(item)}
-              className={`px-3 py-1 border rounded-md ${
-                page === item ? "bg-orange-500 text-white" : ""
-              }`}
-            >
-              {item}
-            </button>
-          )
-        )}
-        <button
-          onClick={() => page < totalPage && setPage(page + 1)}
-          disabled={page === totalPage}
-          className="px-3 py-1 border rounded-md disabled:opacity-50"
-        >
-          &gt;
-        </button>
-      </div>
-    );
-  };
-
-  const breadcrumb = useBreadcrumb ("All Blogs");
-
   if (loading) return <KonncoLoader />;
 
   return (
@@ -155,29 +102,37 @@ const BlogsAdmin = () => {
       <div className="flex-1 flex flex-col md:ml-48">
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-gray-400 mb-2 text-left">{breadcrumb}</div>
           </div>
 
-          <h1 className="text-xl font-bold mb-4 text-left">Blogs</h1>
+          <h1 className="text-xl font-bold mb-2 text-left">Blogs</h1>
 
-          {/* Search, Filter, Add */}
-          <div className="w-full h-10 flex flex-wrap mb-6 gap-2">
+          {/* Card total */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow border border-gray-400">
+              <p className="text-sm text-gray-500">Total Blog</p>
+              <p className="text-2xl font-bold text-orange-500">{total}</p>
+            </div>
+          </div>
+
+          {/* Filter */}
+          <div className="flex flex-wrap gap-2 mb-4 w-full">
             <input
               type="text"
-              placeholder="Cari berdasarkan judul"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="flex-grow rounded-md border border-gray-500 px-2 py-1 focus:outline-none min-w-[180px]"
+              placeholder="Cari Blog"
+              className="w-full max-w-sm border border-gray-300 rounded-md px-4 py-2 text-sm"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
             />
             <div
-              onClick={fetchBlogs}
-              className="w-10 h-10 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              className="w-10 h-9 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                setSearch(searchInput);
+                setPage(1);
+              }}
             >
-              <FaFilter className="text-white" />
+              <FiFilter className="text-white" />
             </div>
             <button
               onClick={() => navigate("/panels/admins/blogs/add_blogs")}
@@ -192,7 +147,7 @@ const BlogsAdmin = () => {
             {blogs.map((blog) => (
               <div
                 key={blog.slug}
-                className="bg-white border border-gray-500 rounded-xl px-6 py-4 shadow-[0_6px_0_0_gray]"
+                className="bg-white border border-gray-400 rounded-xl px-6 py-4 shadow-[0_4px_0_0_gray]"
               >
                 <p className="text-xs text-gray-700 mb-2 text-left">{blog.date}</p>
                 <span className="inline-block text-left text-xs bg-orange-500 text-white font-semibold px-2 py-1 rounded-md mb-2 w-fit">
@@ -227,49 +182,68 @@ const BlogsAdmin = () => {
           </div>
 
           {/* Pagination */}
-          {renderPagination()}
-          
+          <div className="flex justify-between items-center p-4 text-sm text-gray-500">
+            <div>
+              {limit * (page - 1) + 1}-{Math.min(limit * page, total)} dari {total}
+            </div>
+            <div className="join">
+              {pageNumbers.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`join-item btn btn-sm rounded-lg w-8 h-8 p-0 text-xs ${
+                    p === page ? "bg-orange-500 text-white" : ""
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Modal Delete */}
           {showModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6">
-                  <h2 className="text-lg font-semibold mb-4 text-center">Konfirmasi Hapus</h2>
-                  <p className="text-center text-sm text-gray-700 mb-6">
-                    Apakah kamu yakin ingin menghapus blog ini?
-                  </p>
-                  <div className="flex justify-center gap-4">
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="px-4 py-2 text-sm border rounded-md hover:bg-gray-100 border-black shadow-[0_3px_0_0_gray] "
-                    >
-                      Batal
-                    </button>
-                    <button
-                      onClick={handleDeleteConfirmed}
-                      className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 border border-red-600 shadow-[0_3px_0_0_#800000] "
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-            {showSuccessModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
-                  <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Dihapus!</h2>
-                  <p className="text-sm text-gray-700 mb-6">
-                    Blog telah berhasil dihapus.
-                  </p>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-center">Konfirmasi Hapus</h2>
+                <p className="text-center text-sm text-gray-700 mb-6">
+                  Apakah kamu yakin ingin menghapus blog ini?
+                </p>
+                <div className="flex justify-center gap-4">
                   <button
-                    onClick={() => setShowSuccessModal(false)}
-                    className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 text-sm border rounded-md hover:bg-gray-100 border-black shadow-[0_3px_0_0_gray] "
                   >
-                    Tutup
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirmed}
+                    className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 border border-red-600 shadow-[0_3px_0_0_#800000] "
+                  >
+                    Hapus
                   </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Modal Success */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Dihapus!</h2>
+                <p className="text-sm text-gray-700 mb-6">
+                  Blog telah berhasil dihapus.
+                </p>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>
