@@ -76,6 +76,11 @@ const Careers_Admin = () => {
     }
   };
 
+  const truncateText = (text, maxLength) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  };
+
 
   if (loading) return <KonncoLoader />;
 
@@ -121,7 +126,7 @@ const Careers_Admin = () => {
                     {career.title}
                   </h2>
                   <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                    {career.description}
+                    {truncateText(career.description, 100)}
                   </p>
 
                   {/* Tags */}

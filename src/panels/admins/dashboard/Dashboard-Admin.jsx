@@ -15,6 +15,7 @@ const DashboardAdmin = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const breadcrumb = useBreadcrumb("Overview");
   const navigate = useNavigate();
 
   const fetchOverviewData = async () => {
@@ -62,8 +63,6 @@ const DashboardAdmin = () => {
       alert("Gagal menghapus blog.");
     }
   };
-
-  const breadcrumb = useBreadcrumb("Overview");
 
   if (loading) return <KonncoLoader />;
 

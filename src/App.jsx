@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Public 
 import Home from './page/Home';
 import About from './page/AboutApp';
 import Product from './page/ProductApp';
@@ -11,16 +13,24 @@ import Detail_Careers from './page/Detail-Careers';
 import Careers_Apply from './page/CareersApply';
 import ThanksApp from './page/Thanks';
 
+// Admin
 import AuthAdmin from './panels/admins/auth/Login';
 import ForgotPassword from './panels/admins/auth/Forgot-Password';
 import DashboardAdmin from './panels/admins/dashboard/Dashboard-Admin';
+
+// Blogs
 import BlogsAdmin from './panels/admins/blog/Blogs-Admin';
 import Detail_Blogs from './panels/admins/blog/Detail-Blogs-Admin';
 import Edit_Blogs from './panels/admins/blog/Edit-Blogs-Admin';
 import Add_Blogs from './panels/admins/blog/Add-Blogs-Admin';
+
+// Product
 import Product_Admin from './panels/admins/product/Product-Admin';
 import Detail_Product_Admin from './panels/admins/product/Detail-Product-Admin';
+import Add_Product_Admin from './panels/admins/product/Add-Product-Admin';
 // import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
+
+// Careers
 import Careers_Admin from './panels/admins/careers/Careers-Admin';
 // import Add_Careers_Admin from './panels/admins/careers/Add-Careers-Admin';
 import Detail_Careers_Admin from './panels/admins/careers/Detail-Careers-Admin';
@@ -90,6 +100,10 @@ function App() {
           <AdminGuard><Edit_Product_Admin /></AdminGuard>
         } /> */}
 
+        <Route path="/panels/admins/product/add_product" element={
+          <AdminGuard><Add_Product_Admin /></AdminGuard>
+        } />
+
 
         {/* careers Admin */}
         <Route path="/panels/admins/careers" element={
@@ -121,6 +135,8 @@ function App() {
         } />
 
         {/* Fallback Route */}
+        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+        {/* not found 404 */}
 
       </Routes>
     </Router>

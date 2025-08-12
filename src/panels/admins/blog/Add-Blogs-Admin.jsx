@@ -23,6 +23,8 @@ const Add_Blog_Admin = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState("");
   const fileInputRef = useRef(null);
 
+  const breadcrumb = useBreadcrumb("Tambah Blog");
+
   useEffect(() => {
     const stored = localStorage.getItem("adminToken");
     if (stored) {
@@ -84,7 +86,6 @@ const Add_Blog_Admin = () => {
     }
   };
 
-  const breadcrumb = useBreadcrumb("Tambah Blog");
 
   if (loading) return <KonncoLoader />;
 
