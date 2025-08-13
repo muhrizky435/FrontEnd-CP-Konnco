@@ -93,16 +93,15 @@ function App() {
         <Route path="/panels/admins/product" element={
           <AdminGuard><Product_Admin /></AdminGuard>
         } />
-        <Route path="/panels/admins/product/detail/:id" element={
+        <Route path="/panels/admins/product/detail/:productId" element={
           <AdminGuard><Detail_Product_Admin /></AdminGuard>
+        } />
+        <Route path="/panels/admins/product/add_product" element={
+          <AdminGuard><Add_Product_Admin /></AdminGuard>
         } />
         {/* <Route path="/panels/admins/product/edit/:id" element={
           <AdminGuard><Edit_Product_Admin /></AdminGuard>
         } /> */}
-
-        <Route path="/panels/admins/product/add_product" element={
-          <AdminGuard><Add_Product_Admin /></AdminGuard>
-        } />
 
 
         {/* careers Admin */}

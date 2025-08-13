@@ -1,88 +1,64 @@
 import React, { useEffect, useState } from "react";
-import AdminNavbar from "../../../components/AdminNavbar";
 import AdminSidebar from "../../../components/AdminSidebar";
+import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import useBreadcrumb from "../../../components/Breadcrumb";
+import api from "../../../api/axios";
 
-const DetailProductAdmin = () => {
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const location = useLocation();
+const Detail_Product = () => {
   const [loading, setLoading] = useState(true);
+  const [productData, setProductData] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { productId } = useParams();
+
+  const breadcrumb = useBreadcrumb(productData?.title || "Memuat...");
 
   useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timeout);
-  }, []);
+    const fetchProduct = async () => {
+      try {
+        const response = await api.get(`/admins/products/${productId}`);
+        const data = response.data.data;
 
-  const generateBreadcrumb = () => {
-    const pathParts = location.pathname.split("/").filter(Boolean);
-    return pathParts.map((part, idx) => {
-      const isLast = idx === pathParts.length - 1;
-      const label = part.replaceAll("-", " ").replaceAll("_", " ");
-      return (
-        <span
-          key={idx}
-          className={isLast ? "text-orange-500" : "text-gray-400"}
-        >
-          {idx > 0 && " / "}
-          {label.charAt(0).toUpperCase() + label.slice(1)}
-        </span>
-      );
-    });
-  };
+        const baseUrl = "http://localhost:3000/products/";
+        data.mainPhotoUrl = data.mainPhoto ? baseUrl + data.mainPhoto : null;
+        data.secondPhotoUrl = data.secondPhoto ? baseUrl + data.secondPhoto : null;
+        data.thirdPhotoUrl = data.thirdPhoto ? baseUrl + data.thirdPhoto : null;
 
-  if (loading) return <KonncoLoader />;
+        setProductData(data);
+      } catch (error) {
+        console.error("Gagal memuat produk:", error);
+        alert("Gagal memuat produk.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Dummy data sementara
-  const product = {
-    id: 1,
-    title: "Aplikasi Administrasi Klinik/Praktek Medis",
-    bannerImg: "", // Gambar atas
-    screenshotImg: "", // Gambar UI aplikasi
-    description: `Aplikasi yang memudahkan manajemen administrasi klinik dan praktek medis. Aplikasi ini dirancang khusus untuk membantu dokter, staf medis, dan administrasi dalam mengelola berbagai aspek operasional dan administratif sebuah klinik atau praktek medis. 
-                Aplikasi ini memungkinkan pengelolaan yang lebih efisien dari berbagai tugas dan proses yang terkait dengan penyediaan layanan kesehatan.`,
+    fetchProduct();
+  }, [productId]);
 
-    features: [
-      "Pendaftaran & Janji Temu: Pendaftaran online/offline, jadwal dokter, dan pengingat otomatis.",
-      "Rekam Medis Elektronik (RME): Riwayat kesehatan digital, catatan pemeriksaan, dan integrasi lab/radiologi.",
-      "Keuangan & Billing: Tagihan pasien, berbagai metode pembayaran, laporan keuangan.",
-      "Manajemen Obat & Stok: Inventarisasi, peringatan stok, pemesanan otomatis.",
-      "Administrasi & SDM: Data pegawai, jadwal kerja, evaluasi kinerja.",
-      "Laporan & Analitik: Laporan kinerja, analisis pasien, dashboard interaktif.",
-      "Keamanan & Kepatuhan: Enkripsi data dan kontrol akses.",
-    ],
-    benefits: [
-      "Mudah Digunakan: Antarmuka ramah pengguna.",
-      "Efisien: Mengurangi kerja manual, mempercepat proses.",
-      "Skalabel: Cocok untuk klinik kecil hingga rumah sakit.",
-      "Aksesibilitas: Bisa diakses dari berbagai perangkat.",
-      "Integrasi: Mendukung asuransi, laboratorium, dan telemedicine.",
-    ],
-  };
+  if (loading || !productData) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
       <div className="flex-1 flex flex-col md:ml-48">
-        <AdminNavbar
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        />
-        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+        <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
+
+        <main className="px-4 sm:px-6 md:px-16 py-8">
           {/* Breadcrumb */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="text-sm">{generateBreadcrumb()}</div>
-            <span className="text-orange-500">{id}</span>
+          <div className="text-sm text-gray-400 mb-4 text-left">
+            {breadcrumb}
           </div>
 
-          {/* Tombol kembali */}
+          <h1 className="text-xl font-bold mb-4 text-left">Detail Product</h1>
+
           <button
-            className="group text-orange-500 font-semibold mb-6 flex items-center gap-1"
-            onClick={() => navigate(-1)}
+            className="group text-orange-500 font-bold text-md flex items-center gap-1 mb-6"
+            onClick={() => window.history.back()}
           >
             <span className="group-hover:-translate-x-1 transition-transform">
               &larr;
@@ -90,43 +66,103 @@ const DetailProductAdmin = () => {
             Kembali
           </button>
 
-          {/* Banner */}
-          <img
-            src={product.bannerImg}
-            alt="Banner Produk"
-            className="w-full rounded-lg object-cover mb-6"
+          {/* Main Photo, second Photo, Third Photo */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+          {/* Main Photo */}
+            <div className="md:col-span-2">
+              {productData.mainPhotoUrl ? (
+                <img
+                  src={productData.mainPhotoUrl}
+                  alt={productData.title}
+                  className="w-full h-[500px] object-cover rounded"
+                />
+              ) : (
+                <div className="bg-gray-200 w-full h-[500px] rounded"></div>
+              )}
+            </div>
+
+            {/* Second + Third Photo */}
+            <div className="flex flex-col gap-4">
+              {productData.secondPhotoUrl ? (
+                <img
+                  src={productData.secondPhotoUrl}
+                  alt="Second Photo"
+                  className="w-full h-[245px] object-cover rounded"
+                />
+              ) : (
+                <div className="bg-gray-200 w-full h-[245px] rounded"></div>
+              )}
+
+              {productData.thirdPhotoUrl ? (
+                <img
+                  src={productData.thirdPhotoUrl}
+                  alt="Third Photo"
+                  className="w-full h-[245px] object-cover rounded"
+                />
+              ) : (
+                <div className="bg-gray-200 w-full h-[245px] rounded"></div>
+              )}
+            </div>
+          </div>
+
+
+          {/* Title */}
+          <div className="text-lg font-bold mb-4 leading-snug text-left">
+            {productData.title}
+          </div>
+
+          {/* Description */}
+          <div
+            className="text-gray-700 leading-relaxed space-y-5 text-justify"
+            dangerouslySetInnerHTML={{ __html: productData.description }}
           />
 
-          {/* Screenshot UI */}
-          <div className="flex justify-center mb-10">
-            <img
-              src={product.screenshotImg}
-              alt="UI Produk"
-              className="rounded-xl shadow-lg w-full max-w-4xl"
-            />
-          </div>
-
-          {/* Deskripsi */}
-          <div className="mb-6 whitespace-pre-line text-justify text-base leading-relaxed">
-            {product.description}
-          </div>
-
-          {/* Fitur & Keunggulan */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 text-sm sm:text-base text-justify">
-            <div>
-              <ol className="list-decimal pl-5 space-y-2">
-                {product.features.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ol>
+          {/* Main Feature */}
+          {productData.mainFeature && (
+            <div className="mt-4">
+              <h2 className="text-lg font-bold mb-2">Fitur Utama</h2>
+              <div
+                className="text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: productData.mainFeature }}
+              />
             </div>
-            <div>
-              <ol className="list-decimal pl-5 space-y-2">
-                {product.benefits.map((item, index) => (
-                  <li key={index}>{item}</li>
-                ))}
-              </ol>
+          )}
+
+          {/* Advantage */}
+          {productData.advantage && (
+            <div className="mt-2">
+              <h2 className="text-lg font-bold mb-2">Keunggulan</h2>
+              <div
+                className="text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: productData.advantage }}
+              />
             </div>
+          )}
+
+
+          {/* Share Buttons */}
+          <div className="text-black pt-12 font-bold text-lg text-left">
+            Bagikan ke
+          </div>
+          <div className="flex flex-wrap gap-3 mt-4 mb-4">
+            {[
+              { name: "WhatsApp", link: "https://www.whatsapp.com/" },
+              { name: "Instagram", link: "https://www.instagram.com/" },
+              { name: "Tiktok", link: "https://www.tiktok.com/" },
+              { name: "X", link: "https://twitter.com/" },
+              { name: "Facebook", link: "https://www.facebook.com/" },
+            ].map((platform) => (
+              <a
+                key={platform.name}
+                href={platform.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white bg-orange-500 hover:bg-orange-600 text-sm font-semibold py-2 px-4 rounded-md shadow-[0_4px_0_0_#b45309] transition"
+              >
+                {platform.name}
+              </a>
+            ))}
           </div>
         </main>
       </div>
@@ -134,4 +170,4 @@ const DetailProductAdmin = () => {
   );
 };
 
-export default DetailProductAdmin;
+export default Detail_Product;
