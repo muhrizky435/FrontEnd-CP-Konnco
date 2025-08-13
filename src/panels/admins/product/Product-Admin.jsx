@@ -74,7 +74,7 @@ const ProductAdmin = () => {
               {products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white text-black rounded-xl p-4 shadow-[0_4px_0_0_gray] border border-black flex flex-col justify-between"
+                  className="bg-white text-black rounded-xl p-4 shadow-[0_4px_0_0_gray] border border-gray-400 flex flex-col justify-between"
                 >
                   <div>
                     <h2 className="font-bold text-lg mb-2">{product.title}</h2>
@@ -87,7 +87,7 @@ const ProductAdmin = () => {
                       onClick={() =>
                         navigate(`/panels/admins/product/detail/${product.id}`)
                       }
-                      className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-3 py-1 rounded-md shadow-[0_4px_0_0_#b45309]"
+                      className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-3 py-1 rounded-md shadow-[0_3px_0_0_#b45309]"
                     >
                       Lihat
                     </button>
@@ -96,7 +96,7 @@ const ProductAdmin = () => {
                       onClick={() =>
                         navigate(`/panels/admins/product/edit/${product.id}`)
                       }
-                      className="border border-black px-3 py-1 rounded-md hover:bg-gray-200 shadow-[0_4px_0_0_gray]"
+                      className="border border-gray-400 px-3 py-1 rounded-md font-semibold text-gray-900 hover:bg-gray-200 shadow-[0_3px_0_0_gray]"
                     >
                       Edit
                     </button>
@@ -104,7 +104,7 @@ const ProductAdmin = () => {
                       onClick={() =>
                         navigate(`/panels/admins/product/hapus/${product.id}`)
                       }
-                      className="border border-black px-3 py-1 rounded-md hover:bg-gray-200 shadow-[0_4px_0_0_gray]"
+                      className="border border-red-500 px-3 py-1 rounded-md font-semibold text-red-600 hover:bg-red-600 shadow-[0_3px_0_0_#800000]"
                     >
                       Hapus
                     </button>

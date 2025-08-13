@@ -25,8 +25,24 @@ a:focus {
 }
 
 /* editor.css */
-.editor-container {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1rem;
+[contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  color: #9ca3af; /* abu-abu */
+  pointer-events: none;
 }
+.editor-content ul {
+  list-style-type: disc;       /* bullet hitam */
+  list-style-position: inside; /* biar bullet sejajar dengan teks */
+  margin-left: 1.5rem;         /* jarak indent */
+}
+
+.editor-content ol {
+  list-style-type: decimal;    /* angka */
+  list-style-position: inside;
+  margin-left: 1.5rem;
+}
+
+.editor-content li {
+  margin-bottom: 0.25rem;      /* jarak antar item */
+}
+

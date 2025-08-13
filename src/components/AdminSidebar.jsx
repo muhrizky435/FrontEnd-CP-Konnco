@@ -88,7 +88,7 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           >
             <div className="flex items-center gap-2">
               <SiBlogger className="text-orange-500" />
-              Blogs
+              Blog
             </div>
             {openMenus.blogs ? <MdExpandLess /> : <MdExpandMore />}
           </button>

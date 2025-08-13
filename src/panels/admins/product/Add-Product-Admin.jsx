@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../../api/axios";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
-import api from "../../../api/axios";
+import MiniEditor from "../../../components/text-editor/miniEditor";
 
 const Add_Product_Admin = () => {
   const navigate = useNavigate();
@@ -75,26 +76,6 @@ const Add_Product_Admin = () => {
       setLoading(false);
     }
   };
-  
-  const UploadBox = ({ label, preview, onClick }) => (
-    <div className="flex flex-col items-start">
-        <span className="block mb-2 font-semibold">{label}</span>
-        <div
-        onClick={onClick}
-        className="w-40 h-40 sm:w-48 sm:h-48 border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer hover:bg-gray-50 transition"
-        >
-        {preview ? (
-            <img
-            src={preview}
-            alt="Preview"
-            className="w-full h-full object-cover rounded-lg"
-            />
-        ) : (
-            <span className="text-4xl text-gray-400">+</span>
-        )}
-        </div>
-    </div>
-  );
 
   if (loading) return <KonncoLoader />;
 
@@ -117,51 +98,97 @@ const Add_Product_Admin = () => {
             className="space-y-6 bg-white p-6 rounded-lg shadow"
           >
             {/* Upload Photos */}
-            <div className="flex flex-wrap gap-6">
-              <div>
-                <UploadBox
-                  label="Main Photo"
-                  preview={mainPhotoPreview}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Photos
+              </label>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Main Photo */}
+                <div
+                  className="md:col-span-2 aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
                   onClick={() => mainPhotoRef.current.click()}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={mainPhotoRef}
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, setMainPhotoPreview)}
-                  required
-                />
-              </div>
+                >
+                  {mainPhotoPreview ? (
+                    <img
+                      src={mainPhotoPreview}
+                      alt="Main"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-gray-500 flex flex-col items-center">
+                      <span className="text-4xl mb-1">+</span>
+                      <span className="text-sm">Main Photo</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={mainPhotoRef}
+                    className="hidden"
+                    onChange={(e) => handleFileChange(e, setMainPhotoPreview)}
+                    required
+                  />
+                </div>
 
-              <div>
-                <UploadBox
-                  label="Second Photo (Opsional)"
-                  preview={secondPhotoPreview}
-                  onClick={() => secondPhotoRef.current.click()}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={secondPhotoRef}
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, setSecondPhotoPreview)}
-                />
-              </div>
+                {/* Second & Third Photo */}
+                <div className="flex flex-col gap-4">
+                  {/* Second Photo */}
+                  <div
+                    className="aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
+                    onClick={() => secondPhotoRef.current.click()}
+                  >
+                    {secondPhotoPreview ? (
+                      <img
+                        src={secondPhotoPreview}
+                        alt="Second"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-gray-500 flex flex-col items-center">
+                        <span className="text-3xl mb-1">+</span>
+                        <span className="text-xs">Second Photo</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={secondPhotoRef}
+                      className="hidden"
+                      onChange={(e) =>
+                        handleFileChange(e, setSecondPhotoPreview)
+                      }
+                    />
+                  </div>
 
-              <div>
-                <UploadBox
-                  label="Third Photo (Opsional)"
-                  preview={thirdPhotoPreview}
-                  onClick={() => thirdPhotoRef.current.click()}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={thirdPhotoRef}
-                  className="hidden"
-                  onChange={(e) => handleFileChange(e, setThirdPhotoPreview)}
-                />
+                  {/* Third Photo */}
+                  <div
+                    className="aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
+                    onClick={() => thirdPhotoRef.current.click()}
+                  >
+                    {thirdPhotoPreview ? (
+                      <img
+                        src={thirdPhotoPreview}
+                        alt="Third"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-gray-500 flex flex-col items-center">
+                        <span className="text-3xl mb-1">+</span>
+                        <span className="text-xs">Third Photo</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={thirdPhotoRef}
+                      className="hidden"
+                      onChange={(e) =>
+                        handleFileChange(e, setThirdPhotoPreview)
+                      }
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -183,29 +210,27 @@ const Add_Product_Admin = () => {
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full border p-3 rounded h-28 focus:ring-2 focus:ring-orange-400 outline-none"
+                className="w-full border p-3 rounded h-40 focus:ring-2 focus:ring-orange-400 outline-none"
                 placeholder="Masukkan deskripsi produk"
                 required
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-semibold">Main Feature</label>
-              <textarea
+            <div className="border-b pb-6 mb-6">
+              <MiniEditor
+                label="Main Feature"
                 value={mainFeature}
-                onChange={(e) => setMainFeature(e.target.value)}
-                className="w-full border p-3 rounded h-24 focus:ring-2 focus:ring-orange-400 outline-none"
+                onChange={setMainFeature}
                 placeholder="Masukkan fitur utama"
                 required
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-semibold">Advantage</label>
-              <textarea
+            <div className="border-b pb-6 mb-6">
+              <MiniEditor
+                label="Advantage"
                 value={advantage}
-                onChange={(e) => setAdvantage(e.target.value)}
-                className="w-full border p-3 rounded h-24 focus:ring-2 focus:ring-orange-400 outline-none"
+                onChange={setAdvantage}
                 placeholder="Masukkan keunggulan produk"
                 required
               />
@@ -232,7 +257,7 @@ const Add_Product_Admin = () => {
                 <p className="text-sm text-gray-700 mb-6">{errorMessage}</p>
                 <button
                   onClick={() => setShowErrorModal(false)}
-                  className="px-4 py-2 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600"
+                  className="px-4 py-2 text-sm bg-red-700 text-white font-semibold rounded-md hover:bg-red-600"
                 >
                   Tutup
                 </button>
