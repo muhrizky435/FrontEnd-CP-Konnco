@@ -37,12 +37,25 @@ a:focus {
 }
 
 .editor-content ol {
-  list-style-type: decimal;    /* angka */
+  list-style-type: decimal;   
   list-style-position: inside;
   margin-left: 1.5rem;
 }
 
 .editor-content li {
-  margin-bottom: 0.25rem;      /* jarak antar item */
+  margin-bottom: 0.25rem;   
 }
 
+
+/* list  */
+.prose-content ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.prose-content ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}

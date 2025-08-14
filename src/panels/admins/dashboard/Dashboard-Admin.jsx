@@ -201,7 +201,7 @@ const DashboardAdmin = () => {
                   <tr key={application.id} className="border-t text-left">
                     <td className="py-2">{application.applicantName}</td>
                     <td className="px-16 py-2">
-                      {application.career?.title || "Posisi tidak tersedia"}
+                      {application.position || "Posisi tidak tersedia"}
                     </td>
                     <td>
                       <button

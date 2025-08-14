@@ -56,11 +56,11 @@ const Detail_Blog = () => {
             {breadcrumb}
           </div>
 
-          <h1 className="text-xl font-bold mb-4 text-left">Detail Blogs</h1>
+          <h1 className="text-xl font-bold mb-4 text-left">Detail Blog</h1>
 
           <button
             className="group text-orange-500 font-bold text-md flex items-center gap-1 mb-6"
-            onClick={() => window.history.back()}
+            onClick={() => window.history.go(-1)}
           >
             <span className="group-hover:-translate-x-1 transition-transform">
               &larr;

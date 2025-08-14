@@ -1,120 +1,329 @@
-// import React, { useEffect, useState } from "react";
-// import AdminNavbar from "../../../components/AdminNavbar";
-// import AdminSidebar from "../../../components/AdminSidebar";
-// import KonncoLoader from "../../../components/KonncoLoader";
-// import { useNavigate, useParams } from "react-router-dom";
-// import { RichTextEditor } from "@mantine/rte";
+import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../../../api/axios";
+import AdminSidebar from "../../../components/AdminSidebar";
+import AdminNavbar from "../../../components/AdminNavbar";
+import KonncoLoader from "../../../components/KonncoLoader";
+import useBreadcrumb from "../../../components/Breadcrumb";
+import MiniEditor from "../../../components/text-editor/miniEditor";
 
-// const EditProductAdmin = () => {
-//   const { id } = useParams();
-//   const navigate = useNavigate();
+const Edit_Product_Admin = () => {
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const { productId } = useParams();
 
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [mainImage, setMainImage] = useState(null);
-//   const [thumbnailImages, setThumbnailImages] = useState([]);
-//   const [productName, setProductName] = useState("");
-//   const [description, setDescription] = useState("");
-//   const [features, setFeatures] = useState("");
-//   const [advantages, setAdvantages] = useState("");
+  const breadcrumb = useBreadcrumb("Edit Produk");
 
-//   useEffect(() => {
-//     // Simulasi fetch data produk
-//     setTimeout(() => {
-//       // Misal kita set data dummy dulu
-//       setProductName("Contoh Produk");
-//       setDescription("<p>Deskripsi awal</p>");
-//       setFeatures("<ul><li>Fitur 1</li><li>Fitur 2</li></ul>");
-//       setAdvantages("<p>Keunggulan produk</p>");
-//       setIsLoading(false);
-//     }, 800);
-//   }, [id]);
+  // form state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [mainFeature, setMainFeature] = useState("");
+  const [advantage, setAdvantage] = useState("");
 
-//   const handleUpdate = () => {
-//     // Validasi & kirim ke API
-//     console.log({ productName, description, features, advantages, mainImage, thumbnailImages });
-//     alert("Produk berhasil diubah!");
-//   };
+  // file preview
+  const [mainPhotoPreview, setMainPhotoPreview] = useState("");
+  const [secondPhotoPreview, setSecondPhotoPreview] = useState("");
+  const [thirdPhotoPreview, setThirdPhotoPreview] = useState("");
 
-//   const handleImageChange = (e) => {
-//     const file = e.target.files[0];
-//     setMainImage(file);
-//   };
+  // refs
+  const mainPhotoRef = useRef(null);
+  const secondPhotoRef = useRef(null);
+  const thirdPhotoRef = useRef(null);
 
-//   const handleAddThumbnail = () => {
-//     setThumbnailImages([...thumbnailImages, null]);
-//   };
+  useEffect(() => {
+    const fetchProduct = async () => {
+    try {
+        const response = await api.get(`/admins/products/${productId}`);
+        const product = response.data.data;
+        setTitle(product.title || "");
+        setDescription(product.description || "");
+        setMainFeature(product.mainFeature || "");
+        setAdvantage(product.advantage || "");
+        const Photo = `http://localhost:3000/products/${product.mainPhoto}`;
+        setMainPhotoPreview(Photo);
+        setSecondPhotoPreview(`http://localhost:3000/products/${product.secondPhoto}`);
+        setThirdPhotoPreview(`http://localhost:3000/products/${product.thirdPhoto}`);
+    } catch (err) {
+        console.error("Gagal mengambil data produk:", err);
+    } finally {
+        setLoading(false);
+    }
+  };
 
-//   const handleThumbnailChange = (e, index) => {
-//     const file = e.target.files[0];
-//     const updated = [...thumbnailImages];
-//     updated[index] = file;
-//     setThumbnailImages(updated);
-//   };
+  fetchProduct();
+}, [productId]);
 
-//   if (isLoading) return <KonncoLoader />;
+  const handleFileChange = (e, setPreview) => {
+    const file = e.target.files[0];
+    if (file) {
+      const previewURL = URL.createObjectURL(file);
+      setPreview(previewURL);
+    }
+  };
 
-//   return (
-//     <div className="flex bg-black text-white min-h-screen">
-//       <AdminSidebar />
-//       <div className="flex-1">
-//         <AdminNavbar />
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-//         <div className="p-4 space-y-6">
-//           <button onClick={() => navigate(-1)} className="text-orange-500 font-bold">&larr; Kembali</button>
+    try {
+      const form = new FormData();
+      form.append("title", title);
+      form.append("description", description);
+      form.append("mainFeature", mainFeature);
+      form.append("advantage", advantage);
 
-//           <h2 className="text-xl font-bold">Edit Produk: {id}</h2>
+      if (mainPhotoRef.current?.files[0]) {
+        form.append("mainPhoto", mainPhotoRef.current.files[0]);
+      }
+      if (secondPhotoRef.current?.files[0]) {
+        form.append("secondPhoto", secondPhotoRef.current.files[0]);
+      }
+      if (thirdPhotoRef.current?.files[0]) {
+        form.append("thirdPhoto", thirdPhotoRef.current.files[0]);
+      }
 
-//           {/* Upload Gambar Utama */}
-//           <div className="bg-gray-300 rounded-lg h-60 flex items-center justify-center relative">
-//             <label className="cursor-pointer">
-//               <input type="file" className="hidden" onChange={handleImageChange} />
-//               <div className="bg-white w-14 h-14 rounded-md flex items-center justify-center text-2xl text-gray-500">+</div>
-//             </label>
-//           </div>
+      await api.put(`/admins/products/${productId}`, form);
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error("Gagal mengedit produk:", err);
+      setErrorMessage(
+        typeof err.response?.data?.message === "string"
+          ? err.response.data.message
+          : "Terjadi kesalahan, silakan coba lagi"
+      );
+      setShowErrorModal(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//           {/* Upload Thumbnail */}
-//           <div className="flex flex-wrap gap-2">
-//             {thumbnailImages.map((img, index) => (
-//               <input key={index} type="file" onChange={(e) => handleThumbnailChange(e, index)} />
-//             ))}
-//             <button onClick={handleAddThumbnail} className="bg-orange-500 px-2 rounded">+</button>
-//           </div>
+  if (loading) return <KonncoLoader />;
 
-//           {/* Nama Produk */}
-//           <input
-//             type="text"
-//             className="w-full p-2 rounded text-black"
-//             value={productName}
-//             onChange={(e) => setProductName(e.target.value)}
-//             placeholder="Nama Produk"
-//           />
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+      <AdminSidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
+      <div className="flex-1 flex flex-col md:ml-48">
+        <AdminNavbar
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        />
+        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+          <div className="text-sm text-gray-400 mb-4">{breadcrumb}</div>
+          <h1 className="text-2xl font-bold mb-4">Edit Produk</h1>
 
-//           {/* Deskripsi */}
-//           <div>
-//             <label className="block mb-2 font-semibold">Deskripsi Produk</label>
-//             <RichTextEditor value={description} onChange={setDescription} />
-//           </div>
+          <button
+            className="group text-orange-500 font-bold text-md flex items-center gap-1"
+            onClick={() => window.history.go(-1)}
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">
+              &larr;
+            </span>
+            Kembali
+          </button>
 
-//           {/* Fitur */}
-//           <div>
-//             <label className="block mb-2 font-semibold">Fitur</label>
-//             <RichTextEditor value={features} onChange={setFeatures} />
-//           </div>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-white p-6 rounded-lg shadow"
+          >
+            {/* Upload Photos */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Foto Produk
+              </label>
 
-//           {/* Keunggulan */}
-//           <div>
-//             <label className="block mb-2 font-semibold">Keunggulan</label>
-//             <RichTextEditor value={advantages} onChange={setAdvantages} />
-//           </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Main Photo */}
+                <div
+                  className="md:col-span-2 aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-orange-300 transition"
+                  onClick={() => mainPhotoRef.current.click()}
+                >
+                  {mainPhotoPreview ? (
+                    <img
+                      src={mainPhotoPreview}
+                      alt="Main"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="text-gray-500 flex flex-col items-center">
+                      <span className="text-4xl mb-1">+</span>
+                      <span className="text-sm">Foto Utama</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={mainPhotoRef}
+                    className="hidden"
+                    onChange={(e) => handleFileChange(e, setMainPhotoPreview)}
+                  />
+                </div>
 
-//           {/* Tombol Ubah */}
-//           <div className="text-right">
-//             <button onClick={handleUpdate} className="bg-orange-500 px-6 py-2 rounded font-semibold">Ubah</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+                {/* Second & Third Photo */}
+                <div className="flex flex-col gap-4">
+                  {/* Second Photo */}
+                  <div
+                    className="aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-orange-300 transition"
+                    onClick={() => secondPhotoRef.current.click()}
+                  >
+                    {secondPhotoPreview ? (
+                      <img
+                        src={secondPhotoPreview}
+                        alt="Second"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-gray-500 flex flex-col items-center">
+                        <span className="text-3xl mb-1">+</span>
+                        <span className="text-xs">Foto Kedua</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={secondPhotoRef}
+                      className="hidden"
+                      onChange={(e) =>
+                        handleFileChange(e, setSecondPhotoPreview)
+                      }
+                    />
+                  </div>
 
-// export default EditProductAdmin;
+                  {/* Third Photo */}
+                  <div
+                    className="aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover-border-orange-300 transition"
+                    onClick={() => thirdPhotoRef.current.click()}
+                  >
+                    {thirdPhotoPreview ? (
+                      <img
+                        src={thirdPhotoPreview}
+                        alt="Third"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-gray-500 flex flex-col items-center">
+                        <span className="text-3xl mb-1">+</span>
+                        <span className="text-xs">Foto Ketiga</span>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={thirdPhotoRef}
+                      className="hidden"
+                      onChange={(e) =>
+                        handleFileChange(e, setThirdPhotoPreview)
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Input Fields */}
+            <div>
+              <label className="block mb-1 font-semibold">Judul Produk</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan judul produk"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold">Deskripsi</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full border p-3 rounded h-40 focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan deskripsi produk"
+                required
+              />
+            </div>
+
+            <div className="border-b pb-6 mb-6">
+              <MiniEditor
+                label="Fitur Utama"
+                value={mainFeature}
+                onChange={setMainFeature}
+                placeholder="Masukkan fitur utama"
+                required
+              />
+            </div>
+
+            <div className="border-b pb-6 mb-6">
+              <MiniEditor
+                label="Keunggulan"
+                value={advantage}
+                onChange={setAdvantage}
+                placeholder="Masukkan keunggulan produk"
+                required
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 shadow-[0_4px_0_0_#b45309] transition"
+              >
+                Edit Produk
+              </button>
+            </div>
+          </form>
+
+          {/* Modal Error */}
+          {showErrorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-red-600">
+                  Gagal Mengedit
+                </h2>
+                <p className="text-sm text-gray-700 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 text-sm bg-red-700 text-white font-semibold rounded-md hover:bg-red-600"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Sukses */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">
+                  Berhasil Mengedit
+                </h2>
+                <p className="text-sm text-gray-700 mb-6">
+                  Produk telah berhasil diedit.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate("/panels/admins/product");
+                  }}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Edit_Product_Admin;

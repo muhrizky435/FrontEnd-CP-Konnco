@@ -54,11 +54,11 @@ const Detail_Product = () => {
             {breadcrumb}
           </div>
 
-          <h1 className="text-xl font-bold mb-4 text-left">Detail Product</h1>
+          <h1 className="text-xl font-bold mb-4 text-left">Detail Produk</h1>
 
           <button
             className="group text-orange-500 font-bold text-md flex items-center gap-1 mb-6"
-            onClick={() => window.history.back()}
+            onClick={() => window.history.go(-1)}
           >
             <span className="group-hover:-translate-x-1 transition-transform">
               &larr;
@@ -106,7 +106,6 @@ const Detail_Product = () => {
             </div>
           </div>
 
-
           {/* Title */}
           <div className="text-lg font-bold mb-4 leading-snug text-left">
             {productData.title}
@@ -123,7 +122,7 @@ const Detail_Product = () => {
             <div className="mt-4">
               <h2 className="text-lg font-bold mb-2">Fitur Utama</h2>
               <div
-                className="text-gray-700 leading-relaxed"
+                className="text-gray-800 leading-relaxed prose-content"
                 dangerouslySetInnerHTML={{ __html: productData.mainFeature }}
               />
             </div>
@@ -134,7 +133,7 @@ const Detail_Product = () => {
             <div className="mt-2">
               <h2 className="text-lg font-bold mb-2">Keunggulan</h2>
               <div
-                className="text-gray-700 leading-relaxed"
+                className="text-gray-800 leading-relaxed prose-content"
                 dangerouslySetInnerHTML={{ __html: productData.advantage }}
               />
             </div>

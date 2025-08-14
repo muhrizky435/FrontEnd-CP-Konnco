@@ -28,12 +28,12 @@ import Add_Blogs from './panels/admins/blog/Add-Blogs-Admin';
 import Product_Admin from './panels/admins/product/Product-Admin';
 import Detail_Product_Admin from './panels/admins/product/Detail-Product-Admin';
 import Add_Product_Admin from './panels/admins/product/Add-Product-Admin';
-// import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
+import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
 
 // Careers
 import Careers_Admin from './panels/admins/careers/Careers-Admin';
-// import Add_Careers_Admin from './panels/admins/careers/Add-Careers-Admin';
 import Detail_Careers_Admin from './panels/admins/careers/Detail-Careers-Admin';
+// import Add_Careers_Admin from './panels/admins/careers/Add-Careers-Admin';
 // import Edit_Careers_Admin from './panels/admins/careers/Edit-Careers-Admin';
 import Apply_Careers_Admin from './panels/admins/careers/Apply-Careers-Admin';
 import Detail_Apply_Careers_Admin from './panels/admins/careers/Detail-Apply-Careers-Admin';
@@ -99,9 +99,9 @@ function App() {
         <Route path="/panels/admins/product/add_product" element={
           <AdminGuard><Add_Product_Admin /></AdminGuard>
         } />
-        {/* <Route path="/panels/admins/product/edit/:id" element={
+        <Route path="/panels/admins/product/edit/:productId" element={
           <AdminGuard><Edit_Product_Admin /></AdminGuard>
-        } /> */}
+        } />
 
 
         {/* careers Admin */}

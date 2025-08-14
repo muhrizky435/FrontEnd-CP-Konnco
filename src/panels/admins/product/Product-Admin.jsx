@@ -11,26 +11,47 @@ const ProductAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
   const breadcrumb = useBreadcrumb("Produk");
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await api.get("/admins/products");
-        setProducts(res.data.data || []);
-      } catch (err) {
-        console.error("Gagal memuat produk:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get("/admins/products");
+      setProducts(res.data.data || []);
+    } catch (err) {
+      console.error("Gagal memuat produk:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProducts();
   }, []);
 
   const truncateText = (text, maxLength) => {
     if (!text) return "";
     return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+  };
+
+  const confirmDelete = (id) => {
+    setSelectedProductId(Number(id));
+    setShowModal(true);
+  };
+  
+  const handleDeleteConfirmed = async () => {
+    try {
+      await api.delete(`/admins/products/${selectedProductId}`);
+      setProducts((prev) => prev.filter(p => p.id !== selectedProductId));
+      setShowModal(false);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Gagal menghapus produk:", error);
+      alert("Gagal menghapus produk.");
+    }
   };
 
 
@@ -87,7 +108,7 @@ const ProductAdmin = () => {
                       onClick={() =>
                         navigate(`/panels/admins/product/detail/${product.id}`)
                       }
-                      className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-3 py-1 rounded-md shadow-[0_3px_0_0_#b45309]"
+                      className="bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 shadow-[0_3px_0_0_#b45309] px-4 py-2 rounded-md"
                     >
                       Lihat
                     </button>
@@ -96,21 +117,64 @@ const ProductAdmin = () => {
                       onClick={() =>
                         navigate(`/panels/admins/product/edit/${product.id}`)
                       }
-                      className="border border-gray-400 px-3 py-1 rounded-md font-semibold text-gray-900 hover:bg-gray-200 shadow-[0_3px_0_0_gray]"
+                      className="bg-white text-black text-sm font-semibold hover:bg-gray-200 border border-gray-500 shadow-[0_3px_0_0_gray] px-4 py-2 rounded-md"
                     >
                       Edit
                     </button>
+
                     <button
-                      onClick={() =>
-                        navigate(`/panels/admins/product/hapus/${product.id}`)
-                      }
-                      className="border border-red-500 px-3 py-1 rounded-md font-semibold text-red-600 hover:bg-red-600 shadow-[0_3px_0_0_#800000]"
+                      onClick={() => confirmDelete(product.id)}
+                      className="text-red-600 border border-red-600 font-semibold text-sm px-4 py-2 hover:bg-red-600 hover:text-white transition shadow-[0_3px_0_0_#800000] rounded-md"
                     >
                       Hapus
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Modal Delete */}
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md p-6">
+                <h2 className="text-lg font-semibold mb-4 text-center">Konfirmasi Hapus</h2>
+                <p className="text-center text-sm text-gray-700 mb-6">
+                  Apakah kamu yakin ingin menghapus blog ini?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 text-sm border rounded-md hover:bg-gray-100 border-black shadow-[0_3px_0_0_gray] "
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirmed}
+                    className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 border border-red-600 shadow-[0_3px_0_0_#800000] "
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Success */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">Berhasil Dihapus!</h2>
+                <p className="text-sm text-gray-700 mb-6">
+                  Blog telah berhasil dihapus.
+                </p>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
             </div>
           )}
         </main>

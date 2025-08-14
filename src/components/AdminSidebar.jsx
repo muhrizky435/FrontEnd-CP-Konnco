@@ -6,6 +6,7 @@ import {
   MdExpandMore,
   MdExpandLess,
   MdMenu,
+  MdOutlineMessage,
   MdClose,
 } from "react-icons/md";
 import { SiBlogger } from "react-icons/si";
@@ -196,20 +197,18 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
         {/* Pesan Masuk / inquiries */}
         <li>
-          <NavLink
-            to="/panels/admins/inquiries"
-            onClick={closeSidebar}
-            className={({ isActive }) =>
-              `flex items-center gap-2 px-3 py-2 font-semibold rounded-md border transition-all ${
-                isActive
-                  ? "bg-white border-gray-500"
-                  : "text-black border-transparent hover:bg-orange-100"
-              }`
-            }
+          <button
+            onClick={() => {
+              navigate("/panels/admins/inquiries");
+              closeSidebar();
+            }}
+            className="w-full flex justify-between items-center px-3 py-2 font-semibold rounded-md hover:bg-orange-100"
           >
-            <div className="text-orange-500" />
-            Pesan Masuk
-          </NavLink>
+            <div className="flex items-center gap-2">
+              <MdOutlineMessage className="text-orange-500" />
+              Pesan Masuk
+            </div>
+          </button>
         </li>
       </ul>
     </div>

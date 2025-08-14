@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import api from "../../../api/axios";
 import { FiFilter } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -13,7 +13,6 @@ import useBreadcrumb from "../../../components/Breadcrumb";
 
 const ApplyCareers = () => {
   const [applications, setApplications] = useState([]);
-  // console.info("data", applications);
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -24,6 +23,7 @@ const ApplyCareers = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || ""); 
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
 
   const breadcrumb = useBreadcrumb("Careers", "Applications");
@@ -38,42 +38,39 @@ const ApplyCareers = () => {
   ]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (page !== 1) params.set("page", page);
-    setSearchParams(params, { replace: true });
-  }, [search, page, setSearchParams]);
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        setLoading(true);
-        const params = {
-          search,
-          from: dateRange.from,
-          to: dateRange.to,
-          page,
-          limit,
-        };
-        const res = await api.get("/admins/careers/applications", { params });
-        setApplications(res.data?.data || []);
-        setTotal(res.data?.total || 0);
-      } catch (err) {
-        console.error("Error fetching applications:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchApplications();
-  }, [search, page, dateRange]);
-
-  useEffect(() => {
     setDateRange({
       from: format(range[0].startDate, "yyyy-MM-dd"),
       to: format(range[0].endDate, "yyyy-MM-dd"),
     });
   }, [range]);
+
+  const fetchApplications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = {
+        search,
+        from: dateRange.from,
+        to: dateRange.to,
+        page,
+        limit,
+      };
+      const res = await api.get("/admins/careers/applications", { params });
+      setApplications(res.data?.data || []);
+      setTotal(res.data?.pagination?.totalData || 0);
+    } catch (err) {
+      console.error("Error fetching applications:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [search, dateRange, page, limit]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (search) params.set("search", search);
+    if (page !== 1) params.set("page", page);
+    setSearchParams(params, { replace: true });
+    fetchApplications();
+  }, [search, page, dateRange, fetchApplications, setSearchParams]);
 
   const totalPages = Math.ceil(total / limit);
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -90,7 +87,7 @@ const ApplyCareers = () => {
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-6 md:px-4 py-6">
           <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
-          <h1 className="text-xl font-bold mb-6 text-left">Karir</h1>
+          <h1 className="text-xl font-bold mb-6 text-left">Lamaran Masuk</h1>
 
           {/* Filter */}
           <div className="flex flex-wrap gap-2 mb-4 w-full">
@@ -98,9 +95,9 @@ const ApplyCareers = () => {
               type="text"
               placeholder="Cari nama pelamar..."
               className="w-full max-w-sm border border-gray-300 rounded-md px-4 py-2 text-sm"
-              value={search}
+              value={searchInput}
               onChange={(e) => {
-                setSearch(e.target.value);
+                setSearchInput(e.target.value);
                 setPage(1);
               }}
             />
@@ -128,8 +125,13 @@ const ApplyCareers = () => {
               )}
             </div>
 
+            {/* Tombol filter */}
             <div
-              className="w-10 h-8 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              className="w-10 h-9 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                setSearch(searchInput);
+                setPage(1);
+              }}
             >
               <FiFilter className="text-white" />
             </div>
@@ -152,17 +154,20 @@ const ApplyCareers = () => {
                   return (
                     <tr key={applicationId || idx} className="border-b hover:bg-gray-50">
                       <td className="py-2 px-4 text-left">{app.applicantName}</td>
-                      <td className="py-2 text-justify">{app.position || (app.career && app.career.title) || "-"}</td>
+                      <td className="py-2 text-justify">{app.position || "-"}</td>
                       <td className="py-2">
                         <button
-                          className="text-orange-500 hover:underline"
                           onClick={() =>
                             navigate(
                               `/panels/admins/careers/${careerId}/applications/${applicationId}`
                             )
                           }
+                          className="flex group text-sm text-orange-500 font-semibold hover:text-[#F77F4D] items-center gap-1"
                         >
-                          Lihat Detail &rarr;
+                          Lihat Detail
+                          <span className="ml-1 group-hover:translate-x-1 transition-transform">
+                            &rarr;
+                          </span>
                         </button>
                       </td>
                     </tr>

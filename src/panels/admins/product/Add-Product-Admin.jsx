@@ -80,7 +80,7 @@ const Add_Product_Admin = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -89,9 +89,19 @@ const Add_Product_Admin = () => {
         <AdminNavbar
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        <main className="px-4 sm:px-6 md:px-16 py-8">
+        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
           <div className="text-sm text-gray-400 mb-4">{breadcrumb}</div>
-          <h1 className="text-2xl font-bold mb-6">Tambah Produk</h1>
+          <h1 className="text-2xl font-bold mb-4">Tambah Produk</h1>
+
+          <button
+            className="group text-orange-500 font-bold text-md flex items-center gap-1"
+            onClick={() => window.history.go(-1)}
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">
+              &larr;
+            </span>
+            Kembali
+          </button>
 
           <form
             onSubmit={handleSubmit}
@@ -100,13 +110,13 @@ const Add_Product_Admin = () => {
             {/* Upload Photos */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Product Photos
+                Foto Produk
               </label>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Main Photo */}
                 <div
-                  className="md:col-span-2 aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
+                  className="md:col-span-2 aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-orange-300 transition"
                   onClick={() => mainPhotoRef.current.click()}
                 >
                   {mainPhotoPreview ? (
@@ -118,7 +128,7 @@ const Add_Product_Admin = () => {
                   ) : (
                     <div className="text-gray-500 flex flex-col items-center">
                       <span className="text-4xl mb-1">+</span>
-                      <span className="text-sm">Main Photo</span>
+                      <span className="text-sm">Foto Utama</span>
                     </div>
                   )}
                   <input
@@ -135,7 +145,7 @@ const Add_Product_Admin = () => {
                 <div className="flex flex-col gap-4">
                   {/* Second Photo */}
                   <div
-                    className="aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
+                    className="aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-orange-300 transition"
                     onClick={() => secondPhotoRef.current.click()}
                   >
                     {secondPhotoPreview ? (
@@ -147,7 +157,7 @@ const Add_Product_Admin = () => {
                     ) : (
                       <div className="text-gray-500 flex flex-col items-center">
                         <span className="text-3xl mb-1">+</span>
-                        <span className="text-xs">Second Photo</span>
+                        <span className="text-xs">Foto Kedua</span>
                       </div>
                     )}
                     <input
@@ -163,7 +173,7 @@ const Add_Product_Admin = () => {
 
                   {/* Third Photo */}
                   <div
-                    className="aspect-[4/3] border border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 transition"
+                    className="aspect-[4/3] border border-dashed border-gray-700 bg-gray-100 rounded-xl flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:border-orange-300 transition"
                     onClick={() => thirdPhotoRef.current.click()}
                   >
                     {thirdPhotoPreview ? (
@@ -175,7 +185,7 @@ const Add_Product_Admin = () => {
                     ) : (
                       <div className="text-gray-500 flex flex-col items-center">
                         <span className="text-3xl mb-1">+</span>
-                        <span className="text-xs">Third Photo</span>
+                        <span className="text-xs">Foto Ketiga</span>
                       </div>
                     )}
                     <input
@@ -218,7 +228,7 @@ const Add_Product_Admin = () => {
 
             <div className="border-b pb-6 mb-6">
               <MiniEditor
-                label="Main Feature"
+                label="Fitur Utama"
                 value={mainFeature}
                 onChange={setMainFeature}
                 placeholder="Masukkan fitur utama"
@@ -228,7 +238,7 @@ const Add_Product_Admin = () => {
 
             <div className="border-b pb-6 mb-6">
               <MiniEditor
-                label="Advantage"
+                label="Keunggulan"
                 value={advantage}
                 onChange={setAdvantage}
                 placeholder="Masukkan keunggulan produk"

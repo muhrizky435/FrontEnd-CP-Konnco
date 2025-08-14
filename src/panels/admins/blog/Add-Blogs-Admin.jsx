@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../../../api/axios";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
-import api from "../../../api/axios";
+import MiniEditor from "../../../components/text-editor/miniEditor";
 
 const Add_Blog_Admin = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const Add_Blog_Admin = () => {
 
           <button
             className="group text-orange-500 font-bold text-md flex items-center gap-1"
-            onClick={() => window.history.back()}
+            onClick={() => window.history.go(-1)}
           >
             <span className="group-hover:-translate-x-1 transition-transform">
               &larr;
@@ -118,7 +119,7 @@ const Add_Blog_Admin = () => {
                 Thumbnail Gambar
               </h3>
               <div
-                className="w-full h-[300px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-orange-500"
+                className="w-full h-[300px] border border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-orange-300"
                 onClick={handleUploadClick}
               >
                 {thumbnailPreview ? (
@@ -195,12 +196,13 @@ const Add_Blog_Admin = () => {
               />
             </div>
 
+            {/* Konten */}
             <div>
-              <label className="block mb-1 font-semibold">Content</label>
-              <textarea
+              <MiniEditor
+                label="Konten"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full p-2 rounded min-h-[250px] bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none shadow-inner"
+                onChange={setContent}
+                placeholder="Masukkan konten"
                 required
               />
             </div>

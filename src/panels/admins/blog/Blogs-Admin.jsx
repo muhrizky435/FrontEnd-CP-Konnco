@@ -106,7 +106,7 @@ const BlogsAdmin = () => {
             <div className="text-sm text-gray-400 mb-2 text-left">{breadcrumb}</div>
           </div>
 
-          <h1 className="text-xl font-bold mb-2 text-left">Blogs</h1>
+          <h1 className="text-xl font-bold mb-2 text-left">Blog</h1>
 
           {/* Card total */}
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-4 mb-6">
@@ -156,7 +156,9 @@ const BlogsAdmin = () => {
                 <h2 className="text-md md:text-lg font-semibold mb-2 text-justify">
                   {blog.title}
                 </h2>
-                <p className="text-sm text-gray-700 mb-4 text-justify">{blog.content}</p>
+                <p className="text-sm text-gray-700 mb-4 text-justify prose-content"
+                   dangerouslySetInnerHTML={{ __html: blog.content }}
+                />
                 <div className="flex gap-2 justify-start pt-2 flex-wrap">
                   <button
                     onClick={() => navigate(`/panels/admins/blogs/detail_blogs/${blog.slug}`)}

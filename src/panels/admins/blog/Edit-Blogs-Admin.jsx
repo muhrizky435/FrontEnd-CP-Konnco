@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import api from "../../../api/axios";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
-import api from "../../../api/axios";
+import MiniEditor from "../../../components/text-editor/miniEditor";
+
 
 const Edit_Blog_Admin = () => {
   const { slug } = useParams();
@@ -34,7 +36,7 @@ const Edit_Blog_Admin = () => {
       try {
         const res = await api.get(`/admins/blogs/${slug}`);
         const data = res.data?.data;
-        console.log("Data blog:", data);
+        // console.log("Data blog:", data);
 
         if (!data) throw new Error("Data blog tidak ditemukan.");
 
@@ -140,7 +142,7 @@ const Edit_Blog_Admin = () => {
                 Thumbnail Gambar
               </h3>
               <div
-                className="w-full h-[300px] border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-orange-500"
+                className="w-full h-[300px] border border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-orange-300"
                 onClick={handleUploadClick}
               >
                 {thumbnailPreview ? (
@@ -228,12 +230,13 @@ const Edit_Blog_Admin = () => {
               </div>
             </div>
 
+            {/* Konten */}
             <div>
-              <label className="block mb-1 font-semibold">Content</label>
-              <textarea
+              <MiniEditor
+                label="Konten"
                 value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="w-full p-2 rounded min-h-[250px] bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none shadow-inner"
+                onChange={setContent}
+                placeholder="Masukkan konten"
                 required
               />
             </div>
