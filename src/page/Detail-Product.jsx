@@ -50,20 +50,25 @@ const ProductDetailPage = () => {
 
   if (loading || !productData) return <KonncoLoader />;
 
-  const featureList = productData.mainFeature
-    ? productData.mainFeature.split(",").map((item) => item.trim())
-    : [];
+  const mainPhotoSrc =
+    productData.mainPhoto && productData.mainPhoto.trim() !== ""
+      ? `http://localhost:3000/products/${productData.mainPhoto}`
+      : "/img/default.jpeg";
 
-  const advantageList = productData.advantage
-    ? productData.advantage.split(",").map((item) => item.trim())
-    : [];
+  const secondPhotoSrc =
+    productData.secondPhoto && productData.secondPhoto.trim() !== ""
+      ? `http://localhost:3000/products/${productData.secondPhoto}`
+      : "/img/default.jpeg";
 
-  const mainPhotoSrc = productData.mainPhoto || "/img/default.jpeg";
-  const secondPhotoSrc = productData.secondPhoto || "/img/default.jpeg";
   const thirdPhotos =
     Array.isArray(productData.thirdPhoto) && productData.thirdPhoto.length > 0
-      ? productData.thirdPhoto
+      ? productData.thirdPhoto.map(photo =>
+          photo.trim() !== ""
+            ? `http://localhost:3000/products/${photo}`
+            : "/img/default.jpeg"
+        )
       : ["/img/default.jpeg"];
+
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-white font-sans">
@@ -93,7 +98,7 @@ const ProductDetailPage = () => {
           variants={fadeUp}
           src={mainPhotoSrc}
           alt={productData.title}
-          className="w-full h-64 md:h-[450px] object-cover rounded-xl mb-6"
+          className="w-full h-50 md:h-[450px] object-cover rounded-xl mb-6"
         />
 
         {/* Gambar kecil */}
@@ -131,28 +136,30 @@ const ProductDetailPage = () => {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="text-gray-700 text-base leading-relaxed text-left mb-8"
+          className="text-gray-700 text-base leading-relaxed text-justify mb-8"
         >
           {productData.description}
         </motion.p>
 
         <div className="grid md:grid-cols-2 gap-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            <h2 className="text-lg font-semibold mb-2">Fitur Utama:</h2>
-            <ul className="list-decimal list-inside text-gray-700 space-y-1">
-              {featureList.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
+            <div>
+              <h3>Main Features</h3>
+              <div
+                className="text-gray-800 leading-relaxed prose-content"
+                dangerouslySetInnerHTML={{ __html: productData.mainFeature || "" }}
+              />
+            </div>
           </motion.div>
 
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            <h2 className="text-lg font-semibold mb-2">Keunggulan:</h2>
-            <ul className="list-decimal list-inside text-gray-700 space-y-1">
-              {advantageList.map((item, idx) => (
-                <li key={idx}>{item}</li>
-              ))}
-            </ul>
+            <div>
+              <h3>Advantages</h3>
+              <div
+                className="text-gray-800 leading-relaxed prose-content"
+                dangerouslySetInnerHTML={{ __html: productData.advantage || "" }}
+              />
+            </div>
           </motion.div>
         </div>
       </main>

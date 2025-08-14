@@ -4,7 +4,7 @@ import KonncoNavbar from "../components/KonncoNavbar";
 import KonncoFooter from "../components/KonncoFooter";
 import KonncoLoader from "../components/KonncoLoader";
 import { useInView } from "react-intersection-observer";
-import axios from "axios";
+import api from "axios";
 import {
   logoKonnco,
   logoWhite,
@@ -31,7 +31,7 @@ function ProductApp() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/products");
+        const res = await api.get("http://localhost:3000/api/v1/products");
         setProducts(res.data.data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -82,7 +82,7 @@ function ProductApp() {
                 product.mainPhoto &&
                 product.mainPhoto.trim() !== "" &&
                 product.mainPhoto !== "default-photo.jpg"
-                  ? `http://localhost:3000/uploads/${product.mainPhoto}`
+                  ? `http://localhost:3000/products/${product.mainPhoto}`
                   : "/img/default.jpeg";
 
               return (
