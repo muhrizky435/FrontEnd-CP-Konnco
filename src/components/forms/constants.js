@@ -27,3 +27,16 @@ export const POSITION_APPLY = [
   { value: "Marketing", label: "Marketing" },
   { value: "Accounting", label: "Accounting" },
 ];
+
+export const TYPE_CAREERS = [
+  { value: "UI_UX", label: "UI/UX" },
+  { value: "WEB", label: "Web Developer" },
+  { value: "MOBILE", label: "Mobile App Developer" },
+  { value: "DESKTOP", label: "DevOps" },
+  { value: "SYSTEM_ANALIST", label: "System Analyst" },
+  { value: "QUALITY_ASSURANCE", label: "Quality Assurance" },
+  { value: "DATA_ANALYST", label: "Data Analyst" },
+  { value: "GENERAL_AFFAIR", label: "General Affair" },
+  { value: "MARKETING", label: "Marketing" },
+  { value: "ACCOUNTING", label: "Accounting" },
+];

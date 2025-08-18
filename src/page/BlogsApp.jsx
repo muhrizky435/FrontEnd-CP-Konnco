@@ -164,8 +164,9 @@ function BlogsApp() {
                     {blog.title}
                   </div>
 
-                  <div className="text-gray-700 text-sm mb-4 flex-1 text-justify">
-                    {blog.content}
+                  <div className="text-gray-700 text-sm mb-4 flex-1 text-justify prose-content"
+                       dangerouslySetInnerHTML={{ __html: blog.content }}
+                  >
                   </div>
 
                   <Link

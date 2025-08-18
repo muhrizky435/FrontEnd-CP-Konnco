@@ -1,181 +1,294 @@
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import AdminSidebar from "../../../components/AdminSidebar";
-// import AdminNavbar from "../../../components/AdminNavbar";
-// import { LexicalComposer } from "@lexical/react/LexicalComposer";
-// import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-// import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-// import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-// import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-// import ToolbarPlugin from "../../../components/rich-text/LexicalEditorToolbarPlugin";
-// import { $generateHtmlFromNodes } from "@lexical/html";
-// import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-// import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-// import api from "../../../api/axios";
+// add_career_admin.jsx
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../../../api/axios";
+import AdminSidebar from "../../../components/AdminSidebar";
+import AdminNavbar from "../../../components/AdminNavbar";
+import KonncoLoader from "../../../components/KonncoLoader";
+import useBreadcrumb from "../../../components/Breadcrumb";
+import MiniEditor from "../../../components/text-editor/miniEditor";
+import { POSITION_APPLY, TYPE_CAREERS } from "../../../components/forms/constants"; 
 
-// const editorConfig = {
-//   namespace: "KonncoEditor",
-//   theme: {},
-//   onError(error) {
-//     throw error;
-//   },
-// };
+const tagsList = [
+  "Active",
+  "Fulltime",
+  "Web Developer",
+  "Mobile",
+  "Fullstack",
+  "FrontEnd",
+  "BackEnd",
+];
 
-// const AddCareerAdmin = () => {
-//   const navigate = useNavigate();
-//   const [formData, setFormData] = useState({
-//     title: "",
-//     salaryMin: "",
-//     salaryMax: "",
-//     requirements: [],
-//     type: "",
-//     linkedin: "",
-//     jobstreet: "",
-//     glints: "",
-//     tags: [],
-//   });
-//   const [descriptionHTML, setDescriptionHTML] = useState("");
+const Add_Career_Admin = () => {
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData((prev) => ({ ...prev, [name]: value }));
-//   };
+  const breadcrumb = useBreadcrumb("Tambah Career");
 
-//   const handleEditorChange = (editorState) => {
-//     editorState.read(() => {
-//       const html = $generateHtmlFromNodes(editorState);
-//       setDescriptionHTML(html);
-//     });
-//   };
+  // Tags
+  const [selectedTags, setSelectedTags] = useState([]);
+  const toggleTags = (tag) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((s) => s !== tag) : [...prev, tag]
+    );
+  };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
+  // form state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [salary, setSalary] = useState("");
+  const [type, setType] = useState("");
+  const [requirements, setRequirements] = useState("");
 
-//     const data = {
-//       ...formData,
-//       description: descriptionHTML,
-//     };
+  // form state tambahan
+  const [linkedInInfo, setLinkedInInfo] = useState("");
+  const [glintsInfo, setGlintsInfo] = useState("");
+  const [jobStreetInfo, setJobStreetInfo] = useState("");
 
-//     try {
-//       await api.post("/admins/careers", data);
-//       navigate("/admin/careers");
-//     } catch (error) {
-//       console.error("Gagal tambah karir", error);
-//     }
-//   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-//   return (
-//     <div className="flex min-h-screen">
-//       <AdminSidebar />
-//       <div className="flex-1">
-//         <AdminNavbar />
-//         <div className="p-6">
-//           <h1 className="text-2xl font-bold mb-4">Tambah Karir</h1>
-//           <form onSubmit={handleSubmit} className="space-y-4">
-//             <div>
-//               <label className="block font-medium">Judul</label>
-//               <input
-//                 type="text"
-//                 name="title"
-//                 value={formData.title}
-//                 onChange={handleChange}
-//                 className="w-full border px-3 py-2 rounded"
-//                 required
-//               />
-//             </div>
+    try {
+      // ubah requirements string -> array
+      const requirementArray = requirements
+        ? requirements.split("\n").map((r) => r.trim()).filter((r) => r)
+        : [];
 
-//             <div>
-//               <label className="block font-medium mb-1">Deskripsi</label>
-//               <LexicalComposer initialConfig={editorConfig}>
-//                 <div className="editor-container border p-4 rounded">
-//                   <ToolbarPlugin />
-//                   <RichTextPlugin
-//                     contentEditable={<ContentEditable className="editor-input min-h-[200px]" />}
-//                     placeholder={<div className="text-gray-400">Tulis deskripsi karir di sini...</div>}
-//                   />
-//                   <OnChangePlugin onChange={handleEditorChange} />
-//                   <HistoryPlugin />
-//                   <ListPlugin />
-//                   <LinkPlugin />
-//                   <CodeHighlightPlugin />
-//                 </div>
-//               </LexicalComposer>
-//             </div>
+      const payload = {
+        title,
+        description,
+        salary,
+        requirements: requirementArray,
+        type,
+        tags: selectedTags,
+        linkedInInfo,
+        glintsInfo,
+        jobStreetInfo,
+      };
 
-//             <div className="flex gap-2">
-//               <div className="flex-1">
-//                 <label className="block font-medium">Range Gaji (Awal)</label>
-//                 <input
-//                   type="number"
-//                   name="salaryMin"
-//                   value={formData.salaryMin}
-//                   onChange={handleChange}
-//                   className="w-full border px-3 py-2 rounded"
-//                 />
-//               </div>
-//               <div className="flex-1">
-//                 <label className="block font-medium">Range Gaji (Akhir)</label>
-//                 <input
-//                   type="number"
-//                   name="salaryMax"
-//                   value={formData.salaryMax}
-//                   onChange={handleChange}
-//                   className="w-full border px-3 py-2 rounded"
-//                 />
-//               </div>
-//             </div>
+      await api.post("/admins/careers", payload);
+      setShowSuccessModal(true);
+    } catch (err) {
+      console.error("Gagal menambahkan careers:", err);
+      setErrorMessage(
+        typeof err.response?.data?.message === "string"
+          ? err.response.data.message
+          : "Terjadi kesalahan, silakan coba lagi"
+      );
+      setShowErrorModal(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//             <div>
-//               <label className="block font-medium">Tipe Pekerjaan</label>
-//               <input
-//                 type="text"
-//                 name="type"
-//                 value={formData.type}
-//                 onChange={handleChange}
-//                 className="w-full border px-3 py-2 rounded"
-//               />
-//             </div>
-//             <div>
-//               <label className="block font-medium">LinkedIn (opsional)</label>
-//               <input
-//                 type="text"
-//                 name="linkedin"
-//                 value={formData.linkedin}
-//                 onChange={handleChange}
-//                 className="w-full border px-3 py-2 rounded"
-//               />
-//             </div>
-//             <div>
-//               <label className="block font-medium">JobStreet (opsional)</label>
-//               <input
-//                 type="text"
-//                 name="jobstreet"
-//                 value={formData.jobstreet}
-//                 onChange={handleChange}
-//                 className="w-full border px-3 py-2 rounded"
-//               />
-//             </div>
-//             <div>
-//               <label className="block font-medium">Glints (opsional)</label>
-//               <input
-//                 type="text"
-//                 name="glints"
-//                 value={formData.glints}
-//                 onChange={handleChange}
-//                 className="w-full border px-3 py-2 rounded"
-//               />
-//             </div>
-//             <button
-//               type="submit"
-//               className="bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-2 rounded"
-//             >
-//               Tambah
-//             </button>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  if (loading) return <KonncoLoader />;
 
-// export default AddCareerAdmin;
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+      <AdminSidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
+      <div className="flex-1 flex flex-col md:ml-48">
+        <AdminNavbar
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        />
+        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+          <div className="text-sm text-gray-400 mb-4">{breadcrumb}</div>
+          <h1 className="text-2xl font-bold mb-4">Tambah Karir</h1>
+
+          <button
+            className="group text-orange-500 font-bold text-md flex items-center gap-1"
+            onClick={() => window.history.go(-1)}
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">
+              &larr;
+            </span>
+            Kembali
+          </button>
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6 bg-white p-6 rounded-lg shadow"
+          >
+            {/* Input Fields */}
+            <div>
+              <label className="block mb-1 font-semibold">Judul Karir</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan judul career"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold">Deskripsi</label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full border p-3 rounded h-40 focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan deskripsi karir"
+                required
+              />
+            </div>
+
+            <div className="border-b pb-6 mb-6">
+              <MiniEditor
+                label="Persyaratan & Kualifikasi"
+                value={requirements}
+                onChange={setRequirements}
+                placeholder="Pisahkan persyaratan dengan enter"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold">Range Gaji (awal-akhir)</label>
+              <input
+                type="text"
+                value={salary}
+                onChange={(e) => setSalary(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="contoh: 5.000.000 - 10.000.000"
+                required
+              />
+            </div>
+
+            <div>
+               <label className="block mb-1 font-semibold">Tipe Pekerjaan</label>
+               <select
+                    className="w-full border px-3 py-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    required
+                >
+                <option value="">-- Pilih Tipe --</option>
+                {TYPE_CAREERS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                    </option>
+                ))}
+                </select>  
+            </div>     
+
+            {/* Tags */}
+            <h3 className="text-lg font-semibold text-left mb-2 mt-6">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {tagsList.map((tag) => (
+                <button
+                  type="button"
+                  key={tag}
+                  className={`text-sm px-3 py-1 rounded transition-colors duration-200 ${
+                    selectedTags.includes(tag)
+                      ? "bg-[#E86A1C] text-black shadow-[0_4px_0_0_#b45309]"
+                      : "bg-white text-black hover:bg-orange-400 hover:text-black border border-black shadow-[0_4px_0_0_gray]"
+                  }`}
+                  onClick={() => toggleTags(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+
+            {/* input LinkedIn */}
+            <div>
+                <label className="block mb-1 font-semibold">LinkedIn Info (Opsional)</label>
+                <input
+                type="text"
+                value={linkedInInfo}
+                onChange={(e) => setLinkedInInfo(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan link/notes LinkedIn"
+                />
+            </div>
+
+            {/* input Glints */}
+            <div>
+                <label className="block mb-1 font-semibold">Glints Info (Opsional)</label>
+                <input
+                type="text"
+                value={glintsInfo}
+                onChange={(e) => setGlintsInfo(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan link/notes Glints"
+                />
+            </div>
+
+            {/* input JobStreet */}
+            <div>
+                <label className="block mb-1 font-semibold">JobStreet Info (Opsional)</label>
+                <input
+                type="text"
+                value={jobStreetInfo}
+                onChange={(e) => setJobStreetInfo(e.target.value)}
+                className="w-full border p-3 rounded focus:ring-2 focus:ring-orange-400 outline-none"
+                placeholder="Masukkan link/notes JobStreet"
+                />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 shadow-[0_4px_0_0_#b45309] transition"
+              >
+                Tambah Karir
+              </button>
+            </div>
+          </form>
+
+          {/* Modal Error */}
+          {showErrorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-red-600">
+                  Gagal Menambahkan
+                </h2>
+                <p className="text-sm text-gray-700 mb-6">{errorMessage}</p>
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 text-sm bg-red-700 text-white font-semibold rounded-md hover:bg-red-600"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Sukses */}
+          {showSuccessModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
+                <h2 className="text-lg font-semibold mb-4 text-orange-600">
+                  Berhasil Ditambahkan
+                </h2>
+                <p className="text-sm text-gray-700 mb-6">
+                  Karir telah berhasil ditambahkan.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    navigate("/panels/admins/careers"); // fix redirect
+                  }}
+                  className="px-4 py-2 text-sm bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-700"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default Add_Career_Admin;
