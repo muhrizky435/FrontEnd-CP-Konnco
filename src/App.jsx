@@ -45,6 +45,7 @@ import Detail_Inquiries_Admin from './panels/admins/inquiries/Detail-Inquiries-A
 // Manage admin
 import List_Admin from './panels/admins/manage-admin/List-Admin';
 import Add_Admin from './panels/admins/manage-admin/Add-Admin';
+import Edit_Admin from './panels/admins/manage-admin/Edit-Admin';
 
 // Guard component
 const AdminGuard = ({ children }) => {
@@ -146,11 +147,11 @@ function App() {
         <Route path="/panels/admins/manage/add_admin" element={
           <AdminGuard><Add_Admin /></AdminGuard>
         } />
+        <Route path="/panels/admins/manage/edit_admin/:adminId" element={
+          <AdminGuard><Edit_Admin /></AdminGuard>
+        } />
         {/* <Route path="/panels/admins/manage/detail_admin/:adminId" element={
           <AdminGuard><Detail_Admin /></AdminGuard>
-        } /> */}
-        {/* <Route path="/panels/admins/manage/edit_admin/:adminId" element={
-          <AdminGuard><Edit_Admin /></AdminGuard>
         } /> */}
 
         {/* Fallback Route */}

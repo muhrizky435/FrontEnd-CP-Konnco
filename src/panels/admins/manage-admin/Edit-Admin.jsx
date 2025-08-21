@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
@@ -6,14 +6,15 @@ import useBreadcrumb from "../../../components/Breadcrumb";
 import KonncoLoader from "../../../components/KonncoLoader";
 import api from "../../../api/axios";
 
-const Add_Admin = () => {
+const Edit_Admin = () => {
   const navigate = useNavigate();
+  const { adminId } = useParams();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const {adminId} = useParams();
 
   // state form
   const [name, setName] = useState("");
@@ -23,23 +24,48 @@ const Add_Admin = () => {
 
   const breadcrumb = useBreadcrumb("Edit Admins");
 
+  // Fetch data lama berdasarkan adminId
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get(`/super-admins/admins/${adminId}`);
+        const data = res.data.data;
+        setName(data.name);
+        setEmail(data.email);
+        setRole(data.role);
+        setPhoneNumber(data.phoneNumber);
+      } catch (err) {
+        console.error("Gagal mengambil data admin:", err);
+        setErrorMessage("Gagal mengambil data admin");
+        setShowErrorModal(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (adminId) fetchAdmin();
+  }, [adminId]);
+
+  // Submit update admin
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     // Validasi Nama
     if (!name.trim()) {
-        setErrorMessage("Nama tidak boleh kosong");
-        setShowErrorModal(true);
-        setLoading(false);
-        return;
+      setErrorMessage("Nama tidak boleh kosong");
+      setShowErrorModal(true);
+      setLoading(false);
+      return;
     }
 
     // Validasi Email khusus
     if (!email.endsWith("@konnco.com")) {
-        setErrorMessage("Email harus menggunakan domain @konnco.com");
-        setShowErrorModal(true);
-        setLoading(false);
-        return;
+      setErrorMessage("Email harus menggunakan domain @konnco.com");
+      setShowErrorModal(true);
+      setLoading(false);
+      return;
     }
 
     try {
@@ -72,9 +98,7 @@ const Add_Admin = () => {
         setIsSidebarOpen={setIsSidebarOpen}
       />
       <div className="flex-1 flex flex-col md:ml-64">
-        <AdminNavbar
-          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
-        />
+        <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
         <main className="px-4 sm:px-2 md:px-2 py-10 w-full">
           {/* Breadcrumb */}
           <div className="flex items-center justify-between mb-4">
@@ -90,7 +114,7 @@ const Add_Admin = () => {
               &larr;
             </span>
             Kembali
-          </button>          
+          </button>
 
           <form
             onSubmit={handleSubmit}
@@ -121,36 +145,38 @@ const Add_Admin = () => {
                 required
               />
             </div>
-        
+
             {/* form role dan No Telepon */}
             <div className="flex gap-4">
-                {/* Role Dropdown */}
-                <div className="w-1/2">
-                    <select
-                    name="role"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
-                    required
-                    >
-                    <option value="" disabled>Pilih Role</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="SUPER_ADMIN">Super Admin</option>
-                    </select>
-                </div>
+              {/* Role Dropdown */}
+              <div className="w-1/2">
+                <select
+                  name="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+                  required
+                >
+                  <option value="" disabled>
+                    Pilih Role
+                  </option>
+                  <option value="ADMIN">Admin</option>
+                  <option value="SUPER_ADMIN">Super Admin</option>
+                </select>
+              </div>
 
-                {/* No Telepon */}
-                <div className="w-1/2">
-                    <input
-                    name="phoneNumber"
-                    type="text"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
-                    placeholder="Masukan No telepon.."
-                    required
-                    />
-                </div>
+              {/* No Telepon */}
+              <div className="w-1/2">
+                <input
+                  name="phoneNumber"
+                  type="text"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"
+                  placeholder="Masukan No telepon.."
+                  required
+                />
+              </div>
             </div>
             <div className="flex justify-end">
               <button
@@ -162,7 +188,7 @@ const Add_Admin = () => {
             </div>
           </form>
 
-        {/* Modal Error */}
+          {/* Modal Error */}
           {showErrorModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-sm p-6 text-center">
@@ -208,4 +234,4 @@ const Add_Admin = () => {
   );
 };
 
-export default Add_Admin;
+export default Edit_Admin;

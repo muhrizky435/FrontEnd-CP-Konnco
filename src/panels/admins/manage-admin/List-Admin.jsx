@@ -160,7 +160,7 @@ const List_Admin = () => {
                           <div className="flex gap-3 justify-center pb-3 pt-3">
                             <button
                               onClick={() =>
-                                navigate(`/panels/admins/admins/detail_admins/${admin.id}`)
+                                navigate(`/panels/admins/manage/detail_admin/${admin.id}`)
                               }
                               className="bg-[#4731D8] text-white text-xs hover:bg-[#291f69] px-2 py-2 rounded-md"
                             >
@@ -168,7 +168,7 @@ const List_Admin = () => {
                             </button>
                             <button
                               onClick={() =>
-                                navigate(`/panels/admins/admins/edit_admins/${admin.id}`)
+                                navigate(`/panels/admins/manage/edit_admin/${admin.id}`)
                               }
                               className="bg-green-500 text-white text-xs hover:bg-green-800 px-2 py-2 rounded-md"
                             >
