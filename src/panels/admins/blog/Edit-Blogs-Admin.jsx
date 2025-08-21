@@ -15,9 +15,11 @@ const Edit_Blog_Admin = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
   const [loading, setLoading] = useState(true);
 
+  const breadcrumb = useBreadcrumb("Edit Blog");
+
+  // form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState("");
@@ -27,10 +29,10 @@ const Edit_Blog_Admin = () => {
   const [createdAt, setCreatedAt] = useState("");
   const [thumbnailPreview, setThumbnailPreview] = useState("");
 
+  // refs
   const fileInputRef = useRef(null);
 
-  const breadcrumb = useBreadcrumb("Edit Blog");
-
+  // get data blogs berdasrkan slug(id)
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -60,6 +62,8 @@ const Edit_Blog_Admin = () => {
     fetchBlog();
   }, [slug]);
 
+
+  // handle file upload foto
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -74,8 +78,17 @@ const Edit_Blog_Admin = () => {
     }
   };
 
+  // handle submit edit blog
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // validasi content minimal 100 karakter
+    if (!content || content.trim().length < 100) {
+      setErrorMessage("Konten minimal 100 karakter");
+      setShowErrorModal(true);
+      return;
+    }
+
+    // kirim data 
     try {
       const form = new FormData();
       form.append("title", title);
@@ -95,12 +108,20 @@ const Edit_Blog_Admin = () => {
     } catch (err) {
       console.error("Gagal mengedit blog:", err);
       console.error("Full error response:", err.response?.data);
-
+      setErrorMessage(
+        typeof err.response?.data?.message === "string"
+          ? err.response.data.message
+          : "Terjadi kesalahan, silakan coba lagi"
+      );
       if (typeof err.response?.data?.message === "string" && err.response.data.message.toLowerCase().includes("slug")) {
         setErrorMessage("Slug sudah digunakan.");
         setShowErrorModal(true);
       } else if (typeof err.response?.data?.message === "string") {
-        setErrorMessage("Gagal memperbarui blog.");
+        setErrorMessage(
+          typeof err.response?.data?.message === "string"
+            ? err.response.data.message
+            : "Terjadi kesalahan, silakan coba lagi"
+        );
         setShowErrorModal(true);
       }
     }
@@ -160,6 +181,7 @@ const Edit_Blog_Admin = () => {
                   </button>
                 )}
                 <input
+                  name="thumbnailGambar"
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
@@ -172,6 +194,7 @@ const Edit_Blog_Admin = () => {
             <div>
               <label className="block mb-1 font-semibold">Judul</label>
               <input
+                name="judul"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -187,7 +210,7 @@ const Edit_Blog_Admin = () => {
                 onChange={(e) => setType(e.target.value)}
                 className="w-full border p-2 rounded"
               >
-                <option value="">--Pilih Type--</option>
+                <option value="" disabled>--Pilih Type--</option>
                 <option value="TECH">TECH</option>
                 <option value="BUSINESS">BUSINESS</option>
                 <option value="NEWS">NEWS</option>
@@ -199,6 +222,7 @@ const Edit_Blog_Admin = () => {
             <div>
               <label className="block mb-1 font-semibold">Slug</label>
               <input
+                name="slug"
                 type="text"
                 value={slugInput}
                 onChange={(e) => setSlugInput(e.target.value)}
@@ -210,6 +234,7 @@ const Edit_Blog_Admin = () => {
               <div className="w-1/2">
                 <label className="block mb-1 font-semibold">Penulis</label>
                 <input
+                  name="penulis"
                   type="text"
                   value={author}
                   disabled
@@ -222,6 +247,7 @@ const Edit_Blog_Admin = () => {
                   Tanggal Dibuat
                 </label>
                 <input
+                  name="tanggal"
                   type="date"
                   value={createdAt}
                   disabled
@@ -234,6 +260,7 @@ const Edit_Blog_Admin = () => {
             <div>
               <MiniEditor
                 label="Konten"
+                name="konten"
                 value={content}
                 onChange={setContent}
                 placeholder="Masukkan konten"

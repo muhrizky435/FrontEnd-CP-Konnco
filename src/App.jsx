@@ -34,13 +34,17 @@ import Edit_Product_Admin from './panels/admins/product/Edit-Product-Admin';
 import Careers_Admin from './panels/admins/careers/Careers-Admin';
 import Detail_Careers_Admin from './panels/admins/careers/Detail-Careers-Admin';
 import Add_Careers_Admin from './panels/admins/careers/Add-Careers-Admin';
-// import Edit_Careers_Admin from './panels/admins/careers/Edit-Careers-Admin';
+import Edit_Careers_Admin from './panels/admins/careers/Edit-Careers-Admin';
 import Apply_Careers_Admin from './panels/admins/careers/Apply-Careers-Admin';
 import Detail_Apply_Careers_Admin from './panels/admins/careers/Detail-Apply-Careers-Admin';
 
 // Inquiries
 import Inquiries_Admin from './panels/admins/inquiries/Inquiries-Admin';
 import Detail_Inquiries_Admin from './panels/admins/inquiries/Detail-Inquiries-Admin';
+
+// Manage admin
+import List_Admin from './panels/admins/manage-admin/List-Admin';
+import Add_Admin from './panels/admins/manage-admin/Add-Admin';
 
 // Guard component
 const AdminGuard = ({ children }) => {
@@ -122,9 +126,9 @@ function App() {
         <Route path="/panels/admins/careers/add_careers" element={
           <AdminGuard><Add_Careers_Admin /></AdminGuard>
         } />
-        {/* <Route path="/panels/admins/careers/edit_careers/:id" element={
+        <Route path="/panels/admins/careers/edit_careers/:careerId" element={
           <AdminGuard><Edit_Careers_Admin /></AdminGuard>
-        } /> */}
+        } />
 
         {/* Inquiries */}
         <Route path="/panels/admins/inquiries" element={
@@ -133,6 +137,21 @@ function App() {
         <Route path="/panels/admins/inquiries/detail_inquiries/:inquiryId" element={
           <AdminGuard><Detail_Inquiries_Admin /></AdminGuard>
         } />
+
+
+        {/* Manage Admin */}
+        <Route path="/panels/admins/manage/list_admins" element={
+          <AdminGuard><List_Admin /></AdminGuard>
+        } />
+        <Route path="/panels/admins/manage/add_admin" element={
+          <AdminGuard><Add_Admin /></AdminGuard>
+        } />
+        {/* <Route path="/panels/admins/manage/detail_admin/:adminId" element={
+          <AdminGuard><Detail_Admin /></AdminGuard>
+        } /> */}
+        {/* <Route path="/panels/admins/manage/edit_admin/:adminId" element={
+          <AdminGuard><Edit_Admin /></AdminGuard>
+        } /> */}
 
         {/* Fallback Route */}
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}

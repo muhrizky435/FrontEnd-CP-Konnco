@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   MdOutlineDashboard,
   MdExpandMore,
   MdExpandLess,
-  MdMenu,
   MdOutlineMessage,
+  MdOutlineManageAccounts,
   MdClose,
 } from "react-icons/md";
+import { LuLogs } from "react-icons/lu";
 import { SiBlogger } from "react-icons/si";
 import { FaBoxArchive } from "react-icons/fa6";
 import { BsBriefcase } from "react-icons/bs";
+import api from "../api/axios";
 
 const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   const [openMenus, setOpenMenus] = useState({
     blogs: false,
-    product: false, 
+    product: false,
     career: false,
   });
+  const [adminName, setAdminName] = useState("Admin");
+  const [permissions, setPermissions] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
 
@@ -27,13 +31,21 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  const [adminName, setAdminName] = useState("Admin");
-
   useEffect(() => {
-    const admin = JSON.parse(localStorage.getItem("admin"));
-    if (admin?.name) {
-      setAdminName(admin.name);
-    }
+    const fetchDashboard = async () => {
+      try {
+        const res = await api.get("/admins/dashboard/overview"); 
+        const { user } = res.data;
+        if (user?.name) setAdminName(user.name);
+        if (user?.permissions) setPermissions(user.permissions);
+      } catch (err) {
+        console.error("Failed to fetch dashboard:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
   }, []);
 
   const SidebarContent = () => (
@@ -42,7 +54,6 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
         <p className="text-gray-600 text-md">
           Halo, <span className="font-bold text-black">{adminName}</span>
         </p>
-
         <div className="text-gray-400 text-sm mb-2">Admin</div>
         <hr className="my-2" />
         <button
@@ -195,7 +206,7 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
           )}
         </li>
 
-        {/* Pesan Masuk / inquiries */}
+        {/* Pesan Masuk */}
         <li>
           <button
             onClick={() => {
@@ -210,9 +221,54 @@ const AdminSidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
             </div>
           </button>
         </li>
+
+        {/* Manajemen Admin */}
+        {(permissions?.canShowAdmin ||
+          permissions?.canViewAdmin ||
+          permissions?.canCreateAdmin ||
+          permissions?.canUpdateAdmin ||
+          permissions?.canDeleteAdmin) && (
+          <>
+            <div className="text-sm text-black uppercase font-bold text-left pt-4">
+              Manajemen Admin
+            </div>
+
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/panels/admins/manage/list_admins");
+                  closeSidebar();
+                }}
+                className="w-full flex justify-between items-center px-3 py-2 font-semibold rounded-md hover:bg-orange-100"
+              >
+                <div className="flex items-center gap-2">
+                  <MdOutlineManageAccounts className="text-orange-500 w-4 h-4" />
+                  Admin
+                </div>
+              </button>
+            </li>
+
+            <li>
+              <button
+                onClick={() => {
+                  navigate("/panels/admins/logs");
+                  closeSidebar();
+                }}
+                className="w-full flex justify-between items-center px-3 py-2 font-semibold rounded-md hover:bg-orange-100"
+              >
+                <div className="flex items-center gap-2">
+                  <LuLogs className="text-orange-500 w-4 h-4" />
+                  Log
+                </div>
+              </button>
+            </li>
+          </>
+        )}
       </ul>
     </div>
   );
+
+  if (loading) return null;
 
   return (
     <>

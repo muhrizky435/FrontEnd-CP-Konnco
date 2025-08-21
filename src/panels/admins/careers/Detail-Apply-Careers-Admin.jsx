@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FiDownload } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "../../../api/axios";
+import api from "../../../api/axios";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
 import AdminSidebar from "../../../components/AdminSidebar";
 import AdminNavbar from "../../../components/AdminNavbar";
+import { AppWindowIcon } from "lucide-react";
 
 const DetailApplyAdmin = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const DetailApplyAdmin = () => {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
+        const res = await api.get(
           `/admins/careers/${careerId}/applications/${applicationId}`
         );
         setApplication(res.data?.data || null);
@@ -37,7 +38,7 @@ const DetailApplyAdmin = () => {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(
+      await api.delete(
         `/admins/careers/${careerId}/applications/${applicationId}`
       );
       setShowModal(false);
@@ -52,14 +53,14 @@ const DetailApplyAdmin = () => {
   if (loading || !application) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-4">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
-        <main className="px-4 sm:px-6 md:px-16 py-8">
+        <main className="px-4 sm:px-2 md:px-2 py-8">
           <div className="text-sm text-gray-400 mb-4 text-left">
             {breadcrumb}
           </div>

@@ -52,7 +52,8 @@ const AdminLogin = () => {
         JSON.stringify({
           id: result.data.id,
           token: result.data.token,
-          name: result.data.name, 
+          name: result.data.name,
+          role: result.data.role,
         })
       );
       // console.log("ADMIN TOKEN SET:", JSON.parse(localStorage.getItem("adminToken")));

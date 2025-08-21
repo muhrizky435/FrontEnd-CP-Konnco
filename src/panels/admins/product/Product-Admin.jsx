@@ -58,16 +58,16 @@ const ProductAdmin = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-2">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+        <main className="px-4 sm:px-2 md:px-2 py-10 w-full">
           {/* Breadcrumb */}
           <div className="flex items-center justify-between mb-4">
             <div className="text-sm">{breadcrumb}</div>
@@ -89,7 +89,7 @@ const ProductAdmin = () => {
 
           {/* Daftar Produk */}
           {products.length === 0 ? (
-            <p className="text-gray-500">Belum ada produk.</p>
+            <p className="text-gray-500">Ups! Anda tidak diperbolehkan melihat produk. Minta Akses terlebih dahulu</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {products.map((product) => (
@@ -103,7 +103,9 @@ const ProductAdmin = () => {
                       {truncateText(product.description, 100)}
                     </p>
                   </div>
-                  <div className="mt-4 flex gap-2">
+
+                  {/* Tombol Aksi */}
+                  <div className="flex gap-2 justify-start pt-2 flex-wrap">
                     <button
                       onClick={() =>
                         navigate(`/panels/admins/product/detail/${product.id}`)

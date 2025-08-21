@@ -37,7 +37,7 @@ const DetailInquiries = () => {
   if (!inquiry)
     return (
       <div className="p-6 text-center text-red-500">
-        Pesan Masuk tidak ditemukan.
+        Pesan Masuk tidak ditemukan atau minta akses untuk melihat pesan masuk.
       </div>
     );
 

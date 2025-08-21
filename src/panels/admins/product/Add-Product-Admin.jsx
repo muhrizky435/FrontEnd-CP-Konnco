@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/axios";
 import AdminSidebar from "../../../components/AdminSidebar";
@@ -33,18 +33,51 @@ const Add_Product_Admin = () => {
   const secondPhotoRef = useRef(null);
   const thirdPhotoRef = useRef(null);
 
-  const handleFileChange = (e, setPreview) => {
-    const file = e.target.files[0];
-    if (file) {
-      const previewURL = URL.createObjectURL(file);
-      setPreview(previewURL);
-    }
+  // helper: bersihkan semua foto ketika validasi gagal tambah produk
+  const clearPhotos = () => {
+    if (mainPhotoPreview) URL.revokeObjectURL(mainPhotoPreview);
+    if (secondPhotoPreview) URL.revokeObjectURL(secondPhotoPreview);
+    if (thirdPhotoPreview) URL.revokeObjectURL(thirdPhotoPreview);
+    setMainPhotoPreview("");
+    setSecondPhotoPreview("");
+    setThirdPhotoPreview("");
+    if (mainPhotoRef.current) mainPhotoRef.current.value = null;
+    if (secondPhotoRef.current) secondPhotoRef.current.value = null;
+    if (thirdPhotoRef.current) thirdPhotoRef.current.value = null;
   };
 
+  // cleanup saat unmount
+  useEffect(() => {
+    return () => {
+      if (mainPhotoPreview) URL.revokeObjectURL(mainPhotoPreview);
+      if (secondPhotoPreview) URL.revokeObjectURL(secondPhotoPreview);
+      if (thirdPhotoPreview) URL.revokeObjectURL(thirdPhotoPreview);
+    };
+  }, [mainPhotoPreview, secondPhotoPreview, thirdPhotoPreview]);
+
+  
+  // handle upload file
+  const handleFileChange = (e, setPreview) => {
+    const file = e.target.files?.[0];
+    setPreview(prev => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : "";
+    });
+  };
+
+
+  // handle submit tambah
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // validasi manual untuk foto
+    if (!mainPhotoRef.current?.files[0]) {
+      alert("Harap upload foto utama produk!");
+      return;
+    }
     setLoading(true);
 
+    // kirim data 
     try {
       const form = new FormData();
       form.append("title", title);
@@ -72,6 +105,7 @@ const Add_Product_Admin = () => {
           : "Terjadi kesalahan, silakan coba lagi"
       );
       setShowErrorModal(true);
+      clearPhotos();
     } finally {
       setLoading(false);
     }
@@ -132,12 +166,12 @@ const Add_Product_Admin = () => {
                     </div>
                   )}
                   <input
+                    name="mainPhoto"
                     type="file"
                     accept="image/*"
                     ref={mainPhotoRef}
                     className="hidden"
                     onChange={(e) => handleFileChange(e, setMainPhotoPreview)}
-                    required
                   />
                 </div>
 
@@ -161,6 +195,7 @@ const Add_Product_Admin = () => {
                       </div>
                     )}
                     <input
+                      name="secondPhoto"
                       type="file"
                       accept="image/*"
                       ref={secondPhotoRef}
@@ -189,6 +224,7 @@ const Add_Product_Admin = () => {
                       </div>
                     )}
                     <input
+                      name="thirdPhoto"
                       type="file"
                       accept="image/*"
                       ref={thirdPhotoRef}

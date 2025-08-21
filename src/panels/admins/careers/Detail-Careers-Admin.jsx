@@ -11,6 +11,7 @@ const Detail_Careers_Admin = () => {
   const { careerId } = useParams();
   const [career, setCareer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchCareer = async () => {
@@ -45,23 +46,29 @@ const Detail_Careers_Admin = () => {
 
   if (loading) return <KonncoLoader />;
 
-
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
-      <AdminSidebar />
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-4">
+      <AdminSidebar 
+       isSidebarOpen={isSidebarOpen}
+       setIsSidebarOpen={setIsSidebarOpen}
+      />
 
-      <div className="md:ml-60 flex-1 flex flex-col">
-        <AdminNavbar />
+      <div className="md:ml-64 flex-1 flex flex-col">
+        <AdminNavbar 
+          onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
+        />
 
-        <main className="px-4 sm:px-6 md:px-4 py-6">
+        <main className="px-4 sm:px-2 md:px-2 py-6">
           <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
           
            <h1 className="text-xl font-bold mb-6 text-left">Detail Career</h1>
           <button
-            className="text-orange-500 font-semibold text-sm mb-4 hover:underline flex items-center gap-1"
-            onClick={() => window.history.back()}
+            className="group text-orange-500 font-bold text-md flex items-center gap-1 mb-4"
+            onClick={() => window.history.go(-1)}
           >
-            <span className="text-lg">&larr;</span>
+            <span className="group-hover:-translate-x-1 transition-transform">
+              &larr;
+            </span>
             Kembali
           </button>
 
@@ -80,23 +87,19 @@ const Detail_Careers_Admin = () => {
                 {career.description}
               </p>
 
-              {career.requirements.length > 0 && (
                 <div className="mb-6">
-                  <h3 className="font-semibold mb-2">Tanggung Jawab:</h3>
-                  <ul className="list-disc pl-6 space-y-1 text-sm leading-relaxed">
-                    {career.requirements.map((item, idx) => (
-                      <li key={idx}>{item}</li>
-                    ))}
-                  </ul>
+                  <h3 className="font-semibold mb-2">Persyaratan & Kualifikasi</h3>
+                  <p className="text-sm text-justify leading-relaxed mb-4 prose-content"
+                     dangerouslySetInnerHTML={{ __html: career.requirements }}
+                  />
                 </div>
-              )}
             </div>
 
             {/* Kanan - Sidebar */}
             <div className="w-full md:w-72 flex flex-col gap-6">
               {career.tags && career.tags.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-sm mb-2">Persyaratan</h3>
+                  <h3 className="font-semibold text-sm mb-2">Tags</h3>
                   <div className="flex flex-wrap gap-2">
                     {career.tags.map((tag, idx) => (
                       <span

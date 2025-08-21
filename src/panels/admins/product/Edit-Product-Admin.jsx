@@ -34,11 +34,13 @@ const Edit_Product_Admin = () => {
   const secondPhotoRef = useRef(null);
   const thirdPhotoRef = useRef(null);
 
+  // get data produk berdasarkan id 
   useEffect(() => {
     const fetchProduct = async () => {
     try {
         const response = await api.get(`/admins/products/${productId}`);
         const product = response.data.data;
+
         setTitle(product.title || "");
         setDescription(product.description || "");
         setMainFeature(product.mainFeature || "");
@@ -57,6 +59,8 @@ const Edit_Product_Admin = () => {
   fetchProduct();
 }, [productId]);
 
+
+// handle file ubah foto
   const handleFileChange = (e, setPreview) => {
     const file = e.target.files[0];
     if (file) {
@@ -65,6 +69,7 @@ const Edit_Product_Admin = () => {
     }
   };
 
+  // handle submit edit produk
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -104,16 +109,16 @@ const Edit_Product_Admin = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-2">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+        <main className="px-4 sm:px-2 md:px-2 py-10 w-full">
           <div className="text-sm text-gray-400 mb-4">{breadcrumb}</div>
           <h1 className="text-2xl font-bold mb-4">Edit Produk</h1>
 
@@ -156,6 +161,7 @@ const Edit_Product_Admin = () => {
                     </div>
                   )}
                   <input
+                    name="mainPhoto"
                     type="file"
                     accept="image/*"
                     ref={mainPhotoRef}
@@ -184,6 +190,7 @@ const Edit_Product_Admin = () => {
                       </div>
                     )}
                     <input
+                      name="secondPhoto"
                       type="file"
                       accept="image/*"
                       ref={secondPhotoRef}
@@ -212,6 +219,7 @@ const Edit_Product_Admin = () => {
                       </div>
                     )}
                     <input
+                      name="thirdPhoto"
                       type="file"
                       accept="image/*"
                       ref={thirdPhotoRef}

@@ -42,16 +42,16 @@ const Detail_Blog = () => {
   if (loading || !articleData) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-4">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        <main className="px-4 sm:px-6 md:px-16 py-8">
+        <main className="px-4 sm:px-2 md:px-2 py-8">
           <div className="text-sm text-gray-400 mb-4 text-left">
             {breadcrumb}
           </div>

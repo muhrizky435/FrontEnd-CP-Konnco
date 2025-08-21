@@ -14,17 +14,34 @@ const Add_Blog_Admin = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const breadcrumb = useBreadcrumb("Tambah Blog");
 
+  // Use State
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [type, setType] = useState("");
   const [slugInput, setSlugInput] = useState("");
   const [authorId, setAuthorId] = useState("");
   const [authorName, setAuthorName] = useState("");
+
+  // use Ref
   const [thumbnailPreview, setThumbnailPreview] = useState("");
   const fileInputRef = useRef(null);
 
-  const breadcrumb = useBreadcrumb("Tambah Blog");
+  // helper: bersihkan semua foto ketika validasi gagal tambah blogs
+  const clearPhotos = () => {
+    if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    setThumbnailPreview("");
+    if (fileInputRef.current) fileInputRef.current.value = null;
+  };
+
+  // cleanup saat unmount
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) URL.revokeObjectURL(thumbnailPreview);
+    };
+  }, [thumbnailPreview]);
+
 
   useEffect(() => {
     const stored = localStorage.getItem("adminToken");
@@ -39,12 +56,14 @@ const Add_Blog_Admin = () => {
     }
   }, []);
 
+  // hadle upload foto
   const handleUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
+  // handle ubah foto 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -55,7 +74,14 @@ const Add_Blog_Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // validasi manual untuk foto
+    if (!fileInputRef.current?.files[0]) {
+      alert("Harap upload foto utama Blog !");
+      return;
+    }
     setLoading(true);
+
+    // kirim data 
     try {
       const form = new FormData();
       form.append("title", title);
@@ -78,9 +104,11 @@ const Add_Blog_Admin = () => {
       if (typeof err.response?.data?.message === "string" && err.response.data.message.toLowerCase().includes("slug")) {
         setErrorMessage("Slug sudah digunakan, silakan ganti slug lain");
         setShowErrorModal(true);
+        clearPhotos();
       } else if (typeof err.response?.data?.message === "string") {
-        setErrorMessage("Terjadi kesalahan, silakan coba lagi");
+        setErrorMessage(err.response.data.message);
         setShowErrorModal(true);
+        clearPhotos();
       }
     } finally {
       setLoading(false);
@@ -91,14 +119,14 @@ const Add_Blog_Admin = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-4">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
-        <main className="px-4 sm:px-6 md:px-16 py-8">
+        <main className="px-4 sm:px-2 md:px-2 py-8">
           <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
           <h1 className="text-2xl font-bold mb-4">Tambah Blog</h1>
 
@@ -137,6 +165,7 @@ const Add_Blog_Admin = () => {
                   </button>
                 )}
                 <input
+                  name="thumbnailGambar"
                   type="file"
                   accept="image/*"
                   ref={fileInputRef}
@@ -149,6 +178,7 @@ const Add_Blog_Admin = () => {
             <div>
               <label className="block mb-1 font-semibold">Judul</label>
               <input
+                name="judul"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -165,7 +195,7 @@ const Add_Blog_Admin = () => {
                 className="w-full border p-2 rounded"
                 required
               >
-                <option value="">--Pilih Type--</option>
+                <option value="" disabled>--Pilih Tipe--</option>
                 <option value="TECH">TECH</option>
                 <option value="BUSINESS">BUSINESS</option>
                 <option value="NEWS">NEWS</option>
@@ -177,6 +207,7 @@ const Add_Blog_Admin = () => {
             <div>
               <label className="block mb-1 font-semibold">Slug</label>
               <input
+                name="slug"
                 type="text"
                 value={slugInput}
                 onChange={(e) => setSlugInput(e.target.value)}
@@ -189,6 +220,7 @@ const Add_Blog_Admin = () => {
             <div>
               <label className="block mb-1 font-semibold">Penulis</label>
               <input
+                name="penulis"
                 type="text"
                 value={authorName}
                 className="w-full border p-2 rounded bg-gray-100 cursor-not-allowed"
@@ -200,6 +232,7 @@ const Add_Blog_Admin = () => {
             <div>
               <MiniEditor
                 label="Konten"
+                name="konten"
                 value={content}
                 onChange={setContent}
                 placeholder="Masukkan konten"

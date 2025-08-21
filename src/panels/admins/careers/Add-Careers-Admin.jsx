@@ -1,4 +1,3 @@
-// add_career_admin.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../api/axios";
@@ -7,7 +6,7 @@ import AdminNavbar from "../../../components/AdminNavbar";
 import KonncoLoader from "../../../components/KonncoLoader";
 import useBreadcrumb from "../../../components/Breadcrumb";
 import MiniEditor from "../../../components/text-editor/miniEditor";
-import { POSITION_APPLY, TYPE_CAREERS } from "../../../components/forms/constants"; 
+import { TYPE_CAREERS } from "../../../components/forms/constants"; 
 
 const tagsList = [
   "Active",
@@ -89,16 +88,16 @@ const Add_Career_Admin = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-2">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-2">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="flex-1 flex flex-col md:ml-48">
+      <div className="flex-1 flex flex-col md:ml-64">
         <AdminNavbar
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
-        <main className="px-4 sm:px-6 md:px-16 py-10 w-full">
+        <main className="px-4 sm:px-2 md:px-2 py-10 w-full">
           <div className="text-sm text-gray-400 mb-4">{breadcrumb}</div>
           <h1 className="text-2xl font-bold mb-4">Tambah Karir</h1>
 
@@ -170,7 +169,7 @@ const Add_Career_Admin = () => {
                     onChange={(e) => setType(e.target.value)}
                     required
                 >
-                <option value="">-- Pilih Tipe --</option>
+                <option value="" disabled>-- Pilih Tipe --</option>
                 {TYPE_CAREERS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -200,7 +199,10 @@ const Add_Career_Admin = () => {
 
             {/* input LinkedIn */}
             <div>
-                <label className="block mb-1 font-semibold">LinkedIn Info (Opsional)</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="linkedInInfo" className="mb-1 font-semibold">LinkedIn Info</label>
+                  <div className="text-gray-400 text-sm">(opsional)</div>
+                </div>
                 <input
                 type="text"
                 value={linkedInInfo}
@@ -212,7 +214,10 @@ const Add_Career_Admin = () => {
 
             {/* input Glints */}
             <div>
-                <label className="block mb-1 font-semibold">Glints Info (Opsional)</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="glintsInfo" className="mb-1 font-semibold">Glints Info</label>
+                  <div className="text-gray-400 text-sm">(opsional)</div>
+                </div>
                 <input
                 type="text"
                 value={glintsInfo}
@@ -224,7 +229,10 @@ const Add_Career_Admin = () => {
 
             {/* input JobStreet */}
             <div>
-                <label className="block mb-1 font-semibold">JobStreet Info (Opsional)</label>
+                <div className="flex items-center gap-2">
+                  <label htmlFor="JobSreet" className="mb-1 font-semibold">JobStreet</label>
+                  <div className="text-gray-400 text-sm">(opsional)</div>
+                </div>
                 <input
                 type="text"
                 value={jobStreetInfo}

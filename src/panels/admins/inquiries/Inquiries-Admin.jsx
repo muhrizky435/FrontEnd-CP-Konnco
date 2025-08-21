@@ -80,14 +80,14 @@ const Inquiries = () => {
   if (loading) return <KonncoLoader />;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-6 md:px-6 py-4">
+    <div className="min-h-screen flex flex-col md:flex-row mt-16 px-2 sm:px-8 md:px-8 py-4">
       <AdminSidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      <div className="md:ml-60 flex-1 flex flex-col">
+      <div className="md:ml-64 flex-1 flex flex-col">
         <AdminNavbar onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)} />
-        <main className="px-4 sm:px-6 md:px-4 py-6">
+        <main className="px-4 sm:px-2 md:px-2 py-6">
           <div className="text-sm text-gray-400 mb-4 text-left">{breadcrumb}</div>
           <h1 className="text-xl font-bold mb-6 text-left">Pesan Masuk</h1>
 
@@ -104,7 +104,7 @@ const Inquiries = () => {
             <input
               type="text"
               placeholder="Cari Pesan Masuk"
-              className="w-full max-w-sm border border-gray-300 rounded-md px-4 py-2 text-sm"
+              className="md:w-full max-w-lg border border-gray-300 rounded-md px-2 py-2 text-sm"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
@@ -118,7 +118,7 @@ const Inquiries = () => {
                   range[0].endDate,
                   "dd/MM/yyyy"
                 )}`}
-                className="w-full max-w-sm border border-gray-300 rounded-md px-4 py-2 text-sm cursor-pointer text-center text-gray-600"
+                className="w-full max-w-md border ml-4 md:ml-2 border-gray-300 rounded-md px-2 py-2 text-sm cursor-pointer text-center text-gray-600"
               />
               {showDatePicker && (
                 <div className="absolute z-50">
@@ -134,7 +134,7 @@ const Inquiries = () => {
 
             {/* Tombol filter */}
             <div
-              className="w-10 h-9 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
+              className="w-10 h-9 ml-2 md:ml-1 bg-orange-500 rounded-md shadow-[0_4px_0_0_#b45309] flex items-center justify-center cursor-pointer"
               onClick={() => {
                 setSearch(searchInput);
                 setPage(1);
@@ -177,7 +177,7 @@ const Inquiries = () => {
                 {inquiries.length === 0 && (
                   <tr>
                     <td colSpan="4" className="text-center text-gray-400 py-4">
-                      Tidak ada Pesan Masuk.
+                      Ups! Anda tidak diperbolehkan melihat Pesan, Minta Akses terlebih dahulu.
                     </td>
                   </tr>
                 )}

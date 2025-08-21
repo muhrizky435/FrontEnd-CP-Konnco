@@ -21,8 +21,8 @@ const DashboardAdmin = () => {
   const fetchOverviewData = async () => {
     try {
       const adminData = JSON.parse(localStorage.getItem("adminToken"));
+      // console.log(adminData);
       const token = adminData?.token;
-
       const response = await fetch(
         "http://localhost:3000/api/v1/admins/dashboard/overview",
         {
@@ -34,6 +34,7 @@ const DashboardAdmin = () => {
 
       const result = await response.json();
       if (!response.ok) throw new Error(result.message);
+      // console.info(result)
       setOverviewData(result.data);
     } catch (err) {
       console.error("Gagal mengambil data overview:", err.message);
@@ -213,7 +214,7 @@ const DashboardAdmin = () => {
                         className="flex group text-sm text-orange-500 font-semibold hover:text-[#F77F4D] items-center gap-1"
                       >
                         Lihat Detail
-                        <span className="ml-1 group-hover:translate-x-1 transition-transform">
+                        <span className="group-hover:translate-x-1 transition-transform">
                           &rarr;
                         </span>
                       </button>
